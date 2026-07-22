@@ -189,6 +189,7 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
                         Toast.LENGTH_LONG,
                     ).show()
                 },
+                onQuickEdit = { previewing = null; editing = true },
                 onPrint = { ResumeExporter.print(context, it) },
                 onCopyText = {
                     val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE)

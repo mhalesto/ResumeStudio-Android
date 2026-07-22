@@ -63,7 +63,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.input.pointer.pointerInput
 import com.resumestudio.model.ResumeAccent
+import com.resumestudio.model.ResumeContentBlock
 import com.resumestudio.model.ResumeDocument
 import com.resumestudio.model.ResumeTemplate
 import com.resumestudio.render.ResumePageRasterizer
@@ -94,6 +97,7 @@ fun ResumePreviewScreen(
     onTrackableLink: () -> Unit,
     onPrint: (ResumeDocument) -> Unit,
     onCopyText: (ResumeDocument) -> Unit,
+    onQuickEdit: (ResumeContentBlock) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var atsSafe by remember { mutableStateOf(false) }
@@ -241,7 +245,7 @@ fun ResumePreviewScreen(
                 .padding(16.dp),
             contentAlignment = Alignment.Center,
         ) {
-            PageSurface(page?.bitmap, accent)
+            PageSurface(page, accent, onQuickEdit)
         }
 
         page?.takeIf { it.pageCount > 1 }?.let { rendered ->
@@ -266,18 +270,47 @@ fun ResumePreviewScreen(
     }
 }
 
+/**
+ * The page, with a double tap opening whatever section was under the finger.
+ *
+ * Double rather than single, matching iOS: a single tap on a preview is how
+ * people scroll and pinch, and hijacking it would make the page feel like it
+ * was catching at the touch.
+ */
 @Composable
-private fun PageSurface(bitmap: Bitmap?, accent: Color) {
+private fun PageSurface(
+    page: ResumePageRasterizer.Page?,
+    accent: Color,
+    onQuickEdit: (ResumeContentBlock) -> Unit,
+) {
     Box(
-        Modifier.fillMaxWidth().aspectRatio(595f / 842f).cardSurface(radius = 4.dp),
+        Modifier
+            .fillMaxWidth()
+            .aspectRatio(595f / 842f)
+            .cardSurface(radius = 4.dp)
+            .pointerInput(page) {
+                detectTapGestures(
+                    onDoubleTap = { offset ->
+                        val rendered = page ?: return@detectTapGestures
+                        val x = offset.x / size.width.toFloat()
+                        val y = offset.y / size.height.toFloat()
+                        rendered.blocks
+                            .filter { it.pageIndex == rendered.index }
+                            .firstOrNull {
+                                it.contains(x * rendered.pageWidthPoints, y * rendered.pageHeightPoints)
+                            }
+                            ?.let { onQuickEdit(it.block) }
+                    },
+                )
+            },
         contentAlignment = Alignment.Center,
     ) {
-        if (bitmap == null) {
+        if (page == null) {
             CircularProgressIndicator(color = accent)
         } else {
             Image(
-                bitmap = bitmap.asImageBitmap(),
-                contentDescription = "Rendered résumé page",
+                bitmap = page.bitmap.asImageBitmap(),
+                contentDescription = "Rendered résumé page. Double tap a section to edit it.",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier.fillMaxSize(),
             )

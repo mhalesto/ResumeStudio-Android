@@ -42,6 +42,30 @@ import java.io.OutputStream
  */
 class ResumePdfRenderer {
 
+    /**
+     * Where a block ended up, in page coordinates.
+     *
+     * iOS resolves a double-tapped line back to its section by matching the
+     * PDF's text. Android's `PdfRenderer` hands back a bitmap and nothing else,
+     * so the mapping is recorded at the moment of drawing instead — which is
+     * the same answer arrived at from the other side, and is exact rather than
+     * inferred from a string match.
+     */
+    data class BlockBounds(
+        val block: ResumeContentBlock,
+        val pageIndex: Int,
+        val top: Float,
+        val bottom: Float,
+        val left: Float,
+        val right: Float,
+    ) {
+        fun contains(x: Float, y: Float): Boolean = x in left..right && y in top..bottom
+    }
+
+    /** Populated by the last [render]; one entry per block that drew anything. */
+    var lastBlockBounds: List<BlockBounds> = emptyList()
+        private set
+
     fun render(document: ResumeDocument): ByteArray =
         ByteArrayOutputStream().also { render(document, it) }.toByteArray()
 
@@ -50,16 +74,25 @@ class ResumePdfRenderer {
         val plan = document.template.plan
         val pdf = PdfDocument()
 
-        Session(pdf, document, layout.copy(), plan).use { session ->
+        val bounds = mutableListOf<BlockBounds>()
+        Session(pdf, document, layout.copy(), plan, bounds).use { session ->
             session.drawLetterhead()
             layout.sectionOrder
                 .let { if (plan.skillsFirst) it.skillsBeforeProfile() else it }
                 .forEach { session.drawBlock(it) }
         }
+        lastBlockBounds = bounds
 
         pdf.writeTo(out)
         pdf.close()
     }
+
+    /** The block a tap at page-relative [x], [y] (0–1) belongs to, if any. */
+    fun blockAt(pageIndex: Int, x: Float, y: Float, pageWidth: Float, pageHeight: Float): ResumeContentBlock? =
+        lastBlockBounds
+            .filter { it.pageIndex == pageIndex }
+            .firstOrNull { it.contains(x * pageWidth, y * pageHeight) }
+            ?.block
 
     /** `skillsFirst`: skills lead the page, for people whose skills are the pitch. */
     private fun List<ResumeContentBlock>.skillsBeforeProfile(): List<ResumeContentBlock> {
@@ -77,6 +110,7 @@ class ResumePdfRenderer {
         private val document: ResumeDocument,
         private val settings: com.resumestudio.model.ResumeLayoutSettings,
         private val plan: TemplatePlan,
+        private val bounds: MutableList<BlockBounds>,
     ) : AutoCloseable {
 
         private val paper = document.layout.paperSize
@@ -400,6 +434,9 @@ class ResumePdfRenderer {
             }
             if (empty) return
 
+            val startPage = pageNumber - 1
+            val startY = if (inSide) sideCursor else mainCursor
+
             drawSectionTitle(settings.heading(block), rect, inSide, blockTheme, block)
 
             when (block) {
@@ -436,6 +473,18 @@ class ResumePdfRenderer {
                     }
                 }
             }
+
+            val endY = if (inSide) sideCursor else mainCursor
+            // A block that broke across a page is recorded on the page it began,
+            // which is the one a reader would tap to reach it.
+            bounds += BlockBounds(
+                block = block,
+                pageIndex = startPage,
+                top = startY,
+                bottom = if (pageNumber - 1 == startPage) endY else contentBottom,
+                left = rect.left,
+                right = rect.right,
+            )
 
             if (inSide) sideCursor += 14f else mainCursor += 16f
         }

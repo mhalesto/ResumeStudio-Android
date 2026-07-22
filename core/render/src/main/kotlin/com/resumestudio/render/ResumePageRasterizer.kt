@@ -39,13 +39,28 @@ class ResumePageRasterizer(
                     eraseColor(Color.WHITE)
                 }
                 page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
-                Page(bitmap, pageIndex, pdf.pageCount)
+                Page(
+                    bitmap = bitmap,
+                    index = pageIndex,
+                    pageCount = pdf.pageCount,
+                    blocks = renderer.lastBlockBounds,
+                    pageWidthPoints = page.width.toFloat(),
+                    pageHeightPoints = page.height.toFloat(),
+                )
             }
         }
 
     fun pageCount(document: ResumeDocument): Int = withPdf(document) { it.pageCount } ?: 0
 
-    data class Page(val bitmap: Bitmap, val index: Int, val pageCount: Int)
+    data class Page(
+        val bitmap: Bitmap,
+        val index: Int,
+        val pageCount: Int,
+        /** Where each section landed, for resolving a tap back to its editor. */
+        val blocks: List<ResumePdfRenderer.BlockBounds> = emptyList(),
+        val pageWidthPoints: Float = 595.276f,
+        val pageHeightPoints: Float = 841.89f,
+    )
 
     private fun <T> withPdf(document: ResumeDocument, body: (PdfRenderer) -> T): T? {
         val file = File.createTempFile("preview", ".pdf", cacheDir)

@@ -221,14 +221,14 @@ private fun TemplateCard(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         PageThumb(plan, accent, thumbnail)
-        Spacer(Modifier.size(12.dp))
+        Spacer(Modifier.size(14.dp))
         Column(Modifier.weight(1f)) {
             Text(
                 template.wireName.replaceFirstChar { it.uppercase() },
-                fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Theme.ink(),
+                fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Theme.ink(),
             )
-            Spacer(Modifier.height(2.dp))
-            Text(plan.summary(), fontSize = 11.5.sp, color = Theme.mutedInk(), lineHeight = 15.sp)
+            Spacer(Modifier.height(4.dp))
+            Text(plan.summary(), fontSize = 12.sp, color = Theme.mutedInk(), lineHeight = 16.sp)
         }
     }
 }
@@ -242,29 +242,30 @@ private fun PageThumb(plan: TemplatePlan, accent: Color, rendered: Bitmap? = nul
             contentDescription = null,
             contentScale = ContentScale.Fit,
             modifier = Modifier
-                .size(width = 34.dp, height = 48.dp)
-                .clip(RoundedCornerShape(4.dp))
-                .background(Color.White),
+                .size(width = THUMB_WIDTH, height = THUMB_HEIGHT)
+                .clip(RoundedCornerShape(6.dp))
+                .background(Color.White)
+                .border(1.dp, Theme.hairline(), RoundedCornerShape(6.dp)),
         )
         return
     }
     Box(
         Modifier
-            .size(width = 34.dp, height = 48.dp)
-            .clip(RoundedCornerShape(4.dp))
+            .size(width = THUMB_WIDTH, height = THUMB_HEIGHT)
+            .clip(RoundedCornerShape(6.dp))
             // Paper is white whatever the app's theme is doing — the thumbnail
             // stands for the printed page, not for the surface it sits on. Only
             // the dark-paper templates are dark. The second background this used
             // to stack painted straight over the first, which is why every page
             // came out grey.
             .background(if (plan.darkPaper) Color(0xFF14161A) else Color.White)
-            .border(1.dp, Theme.hairline(), RoundedCornerShape(4.dp)),
+            .border(1.dp, Theme.hairline(), RoundedCornerShape(6.dp)),
     ) {
         (plan.body as? BodyLayout.Side)?.let { side ->
             Box(
                 Modifier
                     .fillMaxWidth(side.column.width / 595f)
-                    .height(48.dp)
+                    .height(THUMB_HEIGHT)
                     .align(
                         if (side.column.edge == SideColumn.Edge.LEADING) Alignment.CenterStart
                         else Alignment.CenterEnd,
@@ -534,3 +535,13 @@ internal fun TemplatePlan.summary(): String = buildList {
     if (bodyInset > 0f) add("${bodyInset.toInt()}pt inset")
     if (density != 1f) add("density $density")
 }.joinToString(" · ")
+
+/**
+ * The row thumbnail, at the dashboard tile's size.
+ *
+ * A4's proportions, so the shape of the page is the shape being judged. The
+ * stamp this replaced was small enough that every template looked the same,
+ * which made the list a list of names rather than of layouts.
+ */
+private val THUMB_WIDTH = 76.dp
+private val THUMB_HEIGHT = 108.dp
