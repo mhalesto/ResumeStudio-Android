@@ -123,13 +123,38 @@ class ResumePdfRenderer {
                 }
             }
 
-        /** The narrow column: the facts a recruiter scans for. */
-        private val sideRect: RectF?
+        /**
+         * The painted band, which bleeds off the page on its *outer* edge only.
+         *
+         * Its inner edge is exactly where the column ends, so it must never be
+         * widened for the bleed: the main column starts one gutter further in,
+         * and any overhang here is drawn straight over the top of that text.
+         */
+        private val sideBandRect: RectF?
             get() = side?.let {
                 when (it.edge) {
-                    SideColumn.Edge.LEADING -> RectF(margin, margin, margin + it.width, contentBottom)
+                    SideColumn.Edge.LEADING -> RectF(0f, 0f, margin + it.width, pageHeight)
                     SideColumn.Edge.TRAILING ->
-                        RectF(pageWidth - margin - it.width, margin, pageWidth - margin, contentBottom)
+                        RectF(pageWidth - margin - it.width, 0f, pageWidth, pageHeight)
+                }
+            }
+
+        /**
+         * The narrow column: the facts a recruiter scans for.
+         *
+         * Type is held off the band's inner edge, but never allowed closer to the
+         * page edge than the margin — a filled band may bleed, the words in it
+         * may not.
+         */
+        private val sideRect: RectF?
+            get() = side?.let {
+                val band = sideBandRect ?: return@let null
+                val pad = 20f
+                when (it.edge) {
+                    SideColumn.Edge.LEADING ->
+                        RectF(margin, margin, band.right - pad, contentBottom)
+                    SideColumn.Edge.TRAILING ->
+                        RectF(band.left + pad, margin, pageWidth - margin, contentBottom)
                 }
             }
 
@@ -160,22 +185,14 @@ class ResumePdfRenderer {
         /** The band runs the length of *every* page, not just the first. */
         private fun paintSideColumnBand() {
             val column = side ?: return
-            val rect = sideRect ?: return
+            val band = sideBandRect ?: return
             sideColumnPaper(column.fill, document.accent)?.let {
                 fill.color = it
-                // Bleeds to the page edge: a band that stopped at the margin
-                // would read as a box, which is not what the templates do.
-                canvas.drawRect(
-                    if (column.edge == SideColumn.Edge.LEADING) 0f else rect.left - margin,
-                    0f,
-                    if (column.edge == SideColumn.Edge.LEADING) rect.right + margin else pageWidth,
-                    pageHeight,
-                    fill,
-                )
+                canvas.drawRect(band, fill)
             }
             if (column.divider) {
                 stroke.color = theme.hairline
-                val x = if (column.edge == SideColumn.Edge.LEADING) rect.right + 9f else rect.left - 9f
+                val x = if (column.edge == SideColumn.Edge.LEADING) band.right + 9f else band.left - 9f
                 canvas.drawLine(x, margin, x, contentBottom, stroke)
             }
         }
@@ -273,7 +290,7 @@ class ResumePdfRenderer {
 
                 if (target != null && column != null) {
                     contactPaint.color = RenderTheme.forSideColumn(theme, column.prefersLightInk).mutedInk
-                    drawText(contactLines.joinToString("\n"), contactPaint, target.inset(), inSide = true, topGap = 4f)
+                    drawText(contactLines.joinToString("\n"), contactPaint, target, inSide = true, topGap = 4f)
                 } else {
                     drawText(contactLines.joinToString("   ·   "), contactPaint, headerRect, inSide = false, topGap = 6f)
                 }
@@ -312,7 +329,7 @@ class ResumePdfRenderer {
             if (plan.profileInHeader && block == ResumeContentBlock.PROFILE) return
 
             val inSide = isSideBlock(block)
-            val rect = (if (inSide) sideRect?.inset() else mainRect) ?: mainRect
+            val rect = (if (inSide) sideRect else mainRect) ?: mainRect
             val blockTheme = if (inSide) RenderTheme.forSideColumn(theme, side!!.prefersLightInk) else theme
 
             val empty = when (block) {
@@ -542,6 +559,3 @@ class ResumePdfRenderer {
         }
     }
 }
-
-/** The breathing room inside a side column, so type never touches its band. */
-private fun RectF.inset(by: Float = 12f) = RectF(left + by, top, right - by, bottom)
