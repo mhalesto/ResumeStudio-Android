@@ -86,6 +86,26 @@ Not done, and marked at each site:
 
 Treat the layout as close, not exact, until the golden-image suite lands.
 
+### Output is deterministic per device, but not across devices
+
+Measured, not assumed. Rendering the same four documents on two separate cold
+boots of the same emulator gives byte-identical PDFs — no embedded timestamp, no
+ordering noise. Golden-image comparison will therefore work.
+
+Rendering them on a different device does **not**. The same input produced 87KB
+on an API 36 emulator and 213KB on an API 33 Samsung, which embeds a
+`RobotoStatic-Regular` subset the emulator's file does not name at all.
+
+Two consequences, both for the golden suite:
+
+- It has to pin one device and API level. A golden captured on an emulator will
+  not match a developer's phone, and the failure will look like a layout
+  regression rather than a font substitution.
+- Bundling the fonts is a *prerequisite* for portable output, not a polish task.
+  Today `RenderTheme` resolves type through `Typeface.create("sans-serif", …)`,
+  which is whatever the OEM ships — so the same résumé is set in different metrics
+  on different Android phones, before iOS parity even enters the picture.
+
 ## Stack
 
 Kotlin 2.4 · AGP 9.3 (Kotlin support is built in — no `kotlin-android` plugin) ·
