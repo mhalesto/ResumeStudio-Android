@@ -63,6 +63,7 @@ fun HomeScreen(
     momentum: CareerMomentumSnapshot,
     onOpenGallery: () -> Unit,
     onOpenApplications: () -> Unit,
+    onOpenCoverLetter: () -> Unit,
     onTodayAction: (TodayAction) -> Unit,
     onPreview: () -> Unit,
     onShare: () -> Unit,
@@ -83,7 +84,12 @@ fun HomeScreen(
         item { TodaySection(todayActions, accent, onOpenApplications, onTodayAction) }
         item { StartCreating(accent, onLoadExample, onStartBlank) }
         item { CareerCampaign(accent, momentum, onOpenApplications) }
-        item { CareerWorkspace(accent, resumeCount, applicationCount, onOpenGallery, onOpenApplications) }
+        item {
+            CareerWorkspace(
+                accent, resumeCount, applicationCount,
+                onOpenGallery, onOpenApplications, onOpenCoverLetter,
+            )
+        }
         item { Templates(accent, onOpenGallery, onOpenTemplate) }
         item { RecentlyEdited(document, accent, onEdit) }
         item { PrivacyNote() }
@@ -250,6 +256,7 @@ private fun CareerWorkspace(
     applicationCount: Int,
     onOpenGallery: () -> Unit,
     onOpenApplications: () -> Unit,
+    onOpenCoverLetter: () -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         SectionHeading("Career workspace", "Keep every résumé version and application connected.")
@@ -267,12 +274,12 @@ private fun CareerWorkspace(
         }
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             ArtworkCard(
-                "Interview prep", "Nothing upcoming",
-                R.drawable.workspace_interview, accent, Modifier.weight(1f),
+                "Cover letters", "Draft to match",
+                R.drawable.workspace_import, accent, Modifier.weight(1f), onOpenCoverLetter,
             )
             ArtworkCard(
-                "ATS check", "Score a draft",
-                R.drawable.workspace_ats, accent, Modifier.weight(1f),
+                "Interview prep", "Nothing upcoming",
+                R.drawable.workspace_interview, accent, Modifier.weight(1f),
             )
         }
         SmartLinksCard(accent, linkCount = 0, viewCount = 0, onClick = {})

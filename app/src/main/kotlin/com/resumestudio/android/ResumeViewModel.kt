@@ -3,8 +3,10 @@ package com.resumestudio.android
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.resumestudio.data.ApplicationStore
+import com.resumestudio.data.CoverLetterStore
 import com.resumestudio.data.ResumeStore
 import com.resumestudio.model.CareerMomentumMission
+import com.resumestudio.model.CoverLetterDocument
 import com.resumestudio.model.CareerMomentumPillar
 import com.resumestudio.model.CareerMomentumSnapshot
 import com.resumestudio.model.JobApplication
@@ -31,6 +33,9 @@ class ResumeViewModel(application: Application) : AndroidViewModel(application) 
 
     private val store = ResumeStore(File(application.filesDir, "draft.json"))
     private val applicationStore = ApplicationStore(File(application.filesDir, "applications.json"))
+    private val coverLetterStore = CoverLetterStore(File(application.filesDir, "cover-letter.json"))
+
+    val coverLetter = coverLetterStore.document
 
     val applications = applicationStore.applications
 
@@ -64,6 +69,13 @@ class ResumeViewModel(application: Application) : AndroidViewModel(application) 
     fun setPaperSize(size: ResumePaperSize) = edit { it.copy(layout = it.layout.copy(paperSize = size)) }
 
     fun setFontChoice(choice: ResumeFontChoice) = edit { it.copy(layout = it.layout.copy(fontChoice = choice)) }
+
+    // --- cover letter ------------------------------------------------------
+
+    fun editCoverLetter(transform: (CoverLetterDocument) -> CoverLetterDocument) =
+        coverLetterStore.edit(transform)
+
+    fun seedCoverLetterFromResume() = coverLetterStore.seedFrom(document)
 
     // --- pipeline ---------------------------------------------------------
 

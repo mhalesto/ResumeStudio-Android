@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.resumestudio.android.ui.EditorScreen
 import com.resumestudio.android.ui.ApplicationsScreen
+import com.resumestudio.android.ui.CoverLetterScreen
 import com.resumestudio.android.ui.FloatingCareerCoach
 import com.resumestudio.android.ui.SettingsScreen
 import com.resumestudio.android.ui.GalleryScreen
@@ -93,6 +94,7 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
     val library by viewModel.state.collectAsState()
     val coachIntroDismissed by viewModel.coachIntroDismissed.collectAsState()
     val applications by viewModel.applications.collectAsState()
+    val coverLetter by viewModel.coverLetter.collectAsState()
     val document = library.document
     val accent = document.accent
     val momentum = remember(applications) { viewModel.momentum() }
@@ -102,6 +104,7 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
     var previewing by rememberSaveable { mutableStateOf<String?>(null) }
     var editing by rememberSaveable { mutableStateOf(false) }
     var coaching by rememberSaveable { mutableStateOf(false) }
+    var writingLetter by rememberSaveable { mutableStateOf(false) }
 
     ResumeStudioTheme(accent = accent) {
         val accentColor = LocalAccent.current
@@ -120,6 +123,20 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
                     previewing = null
                 },
                 onShare = { ResumeExporter.share(context, document.copy(template = template)) },
+                modifier = Modifier.fillMaxSize(),
+            )
+            return@ResumeStudioTheme
+        }
+
+        if (writingLetter) {
+            BackHandler { writingLetter = false }
+            CoverLetterScreen(
+                document = coverLetter,
+                accent = accentColor,
+                onEdit = viewModel::editCoverLetter,
+                onSeedFromResume = viewModel::seedCoverLetterFromResume,
+                onShare = { ResumeExporter.shareCoverLetter(context, coverLetter) },
+                onBack = { writingLetter = false },
                 modifier = Modifier.fillMaxSize(),
             )
             return@ResumeStudioTheme
@@ -153,6 +170,7 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
                         momentum = momentum,
                         onOpenGallery = { tab = AppTab.DOCUMENTS.name },
                         onOpenApplications = { tab = AppTab.APPLICATIONS.name },
+                        onOpenCoverLetter = { writingLetter = true },
                         onTodayAction = { action ->
                             when (action.route) {
                                 TodayRoute.EDITOR, TodayRoute.CLAIMS -> editing = true

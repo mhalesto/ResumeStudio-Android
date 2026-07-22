@@ -3,7 +3,9 @@ package com.resumestudio.android
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.FileProvider
+import com.resumestudio.model.CoverLetterDocument
 import com.resumestudio.model.ResumeDocument
+import com.resumestudio.render.CoverLetterPdfRenderer
 import com.resumestudio.render.ResumePdfRenderer
 import java.io.File
 
@@ -23,8 +25,16 @@ object ResumeExporter {
 
     private const val AUTHORITY_SUFFIX = ".fileprovider"
 
-    fun share(context: Context, document: ResumeDocument) {
-        val file = render(context, document)
+    fun share(context: Context, document: ResumeDocument) = share(context, render(context, document))
+
+    fun shareCoverLetter(context: Context, letter: CoverLetterDocument) {
+        val directory = exportDirectory(context)
+        val file = File(directory, "${letter.suggestedFilename}.pdf")
+        file.writeBytes(CoverLetterPdfRenderer().render(letter))
+        share(context, file)
+    }
+
+    private fun share(context: Context, file: File) {
         val uri = FileProvider.getUriForFile(
             context,
             context.packageName + AUTHORITY_SUFFIX,
@@ -54,12 +64,14 @@ object ResumeExporter {
      * attached to an application.
      */
     fun render(context: Context, document: ResumeDocument): File {
-        val directory = File(context.cacheDir, "exports").apply {
-            deleteRecursively()
-            mkdirs()
-        }
-        val file = File(directory, "${document.suggestedFilename}.pdf")
+        val file = File(exportDirectory(context), "${document.suggestedFilename}.pdf")
         file.writeBytes(ResumePdfRenderer().render(document))
         return file
     }
+
+    private fun exportDirectory(context: Context): File =
+        File(context.cacheDir, "exports").apply {
+            deleteRecursively()
+            mkdirs()
+        }
 }
