@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.resumestudio.android.R
 import com.resumestudio.model.CareerMomentumSnapshot
+import com.resumestudio.model.TodayAction
 import com.resumestudio.model.ResumeDocument
 import com.resumestudio.model.ResumeTemplate
 import com.resumestudio.model.TemplateCatalogue
@@ -57,7 +58,12 @@ fun HomeScreen(
     document: ResumeDocument,
     accent: Color,
     resumeCount: Int,
+    applicationCount: Int,
+    todayActions: List<TodayAction>,
+    momentum: CareerMomentumSnapshot,
     onOpenGallery: () -> Unit,
+    onOpenApplications: () -> Unit,
+    onTodayAction: (TodayAction) -> Unit,
     onPreview: () -> Unit,
     onShare: () -> Unit,
     onEdit: () -> Unit,
@@ -74,9 +80,10 @@ fun HomeScreen(
         verticalArrangement = Arrangement.spacedBy(Theme.sectionSpacing),
     ) {
         item { Hero(document, accent, onPreview, onShare, onOpenGallery) }
+        item { TodaySection(todayActions, accent, onOpenApplications, onTodayAction) }
         item { StartCreating(accent, onLoadExample, onStartBlank) }
-        item { CareerCampaign(accent) }
-        item { CareerWorkspace(accent, resumeCount, onOpenGallery) }
+        item { CareerCampaign(accent, momentum, onOpenApplications) }
+        item { CareerWorkspace(accent, resumeCount, applicationCount, onOpenGallery, onOpenApplications) }
         item { Templates(accent, onOpenGallery, onOpenTemplate) }
         item { RecentlyEdited(document, accent, onEdit) }
         item { PrivacyNote() }
@@ -237,7 +244,13 @@ private fun QuickStartCard(
 // --- workspace --------------------------------------------------------------
 
 @Composable
-private fun CareerWorkspace(accent: Color, resumeCount: Int, onOpenGallery: () -> Unit) {
+private fun CareerWorkspace(
+    accent: Color,
+    resumeCount: Int,
+    applicationCount: Int,
+    onOpenGallery: () -> Unit,
+    onOpenApplications: () -> Unit,
+) {
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         SectionHeading("Career workspace", "Keep every résumé version and application connected.")
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -247,8 +260,9 @@ private fun CareerWorkspace(accent: Color, resumeCount: Int, onOpenGallery: () -
                 R.drawable.workspace_resumes, accent, Modifier.weight(1f), onOpenGallery,
             )
             ArtworkCard(
-                "Applications", "0 tracked",
-                R.drawable.workspace_applications, accent, Modifier.weight(1f),
+                "Applications",
+                "$applicationCount tracked",
+                R.drawable.workspace_applications, accent, Modifier.weight(1f), onOpenApplications,
             )
         }
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -273,14 +287,10 @@ private fun CareerWorkspace(accent: Color, resumeCount: Int, onOpenGallery: () -
  * padded out with plausible-looking numbers.
  */
 @Composable
-private fun CareerCampaign(accent: Color) {
+private fun CareerCampaign(accent: Color, momentum: CareerMomentumSnapshot, onOpen: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         SectionHeading("This week", "Momentum comes from a rhythm, not a burst.")
-        MomentumCard(
-            snapshot = CareerMomentumSnapshot.empty(),
-            accent = accent,
-            onClick = {},
-        )
+        MomentumCard(snapshot = momentum, accent = accent, onClick = onOpen)
         HeroBanner(
             title = "Career intelligence",
             subtitle = "Benchmarks, market signals and what they mean for your next move.",

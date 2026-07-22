@@ -51,7 +51,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.resumestudio.android.ui.EditorScreen
+import com.resumestudio.android.ui.ApplicationsScreen
 import com.resumestudio.android.ui.FloatingCareerCoach
+import com.resumestudio.android.ui.SettingsScreen
 import com.resumestudio.android.ui.GalleryScreen
 import com.resumestudio.android.ui.HomeScreen
 import com.resumestudio.android.ui.LocalAccent
@@ -62,6 +64,8 @@ import com.resumestudio.android.ui.Theme
 import com.resumestudio.android.ui.cardSurface
 import com.resumestudio.android.ui.displayStyle
 import com.resumestudio.model.ResumeAccent
+import com.resumestudio.model.TodayActions
+import com.resumestudio.model.TodayRoute
 import com.resumestudio.model.ResumeTemplate
 
 class MainActivity : ComponentActivity() {
@@ -88,8 +92,11 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
     // would let the two drift and make the Settings caption a lie.
     val library by viewModel.state.collectAsState()
     val coachIntroDismissed by viewModel.coachIntroDismissed.collectAsState()
+    val applications by viewModel.applications.collectAsState()
     val document = library.document
     val accent = document.accent
+    val momentum = remember(applications) { viewModel.momentum() }
+    val todayActions = remember(document, momentum) { TodayActions.build(document, momentum) }
 
     var tab by rememberSaveable { mutableStateOf(AppTab.HOME.name) }
     var previewing by rememberSaveable { mutableStateOf<String?>(null) }
@@ -141,7 +148,20 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
                         document = document,
                         accent = accentColor,
                         resumeCount = library.resumes.size,
+                        applicationCount = applications.size,
+                        todayActions = todayActions,
+                        momentum = momentum,
                         onOpenGallery = { tab = AppTab.DOCUMENTS.name },
+                        onOpenApplications = { tab = AppTab.APPLICATIONS.name },
+                        onTodayAction = { action ->
+                            when (action.route) {
+                                TodayRoute.EDITOR, TodayRoute.CLAIMS -> editing = true
+                                TodayRoute.GALLERY -> tab = AppTab.DOCUMENTS.name
+                                TodayRoute.PREVIEW -> previewing = document.template.wireName
+                                TodayRoute.MOMENTUM, TodayRoute.APPLICATIONS ->
+                                    tab = AppTab.APPLICATIONS.name
+                            }
+                        },
                         onPreview = { previewing = document.template.wireName },
                         onShare = { ResumeExporter.share(context, document) },
                         onEdit = { editing = true },
@@ -155,13 +175,32 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
                         onOpenTemplate = { previewing = it.wireName },
                     )
 
-                    AppTab.APPLICATIONS -> ComingSoon(
-                        "Applications",
-                        "Tracking, packets and interview prep land here once the " +
-                            "application store is ported.",
+                    AppTab.APPLICATIONS -> ApplicationsScreen(
+                        applications = applications,
+                        accent = accentColor,
+                        onAdd = viewModel::addApplication,
+                        onSetStatus = viewModel::setApplicationStatus,
+                        onRemove = viewModel::removeApplication,
                     )
 
-                    AppTab.SETTINGS -> SettingsScreen(accent, viewModel::setAccent)
+                    AppTab.SETTINGS -> SettingsScreen(
+                        document = document,
+                        accent = accentColor,
+                        onPickAccent = viewModel::setAccent,
+                        onPickPaper = viewModel::setPaperSize,
+                        onPickFont = viewModel::setFontChoice,
+                        onOpenUrl = { url ->
+                            runCatching {
+                                context.startActivity(
+                                    android.content.Intent(
+                                        android.content.Intent.ACTION_VIEW,
+                                        android.net.Uri.parse(url),
+                                    ),
+                                )
+                            }
+                        },
+                        versionName = BuildConfig.VERSION_NAME,
+                    )
                 }
 
                 // Over the content, not in it: an assistant that is available

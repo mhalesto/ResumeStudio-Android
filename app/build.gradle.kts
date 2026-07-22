@@ -26,6 +26,8 @@ android {
 
     buildFeatures {
         compose = true
+        // For BuildConfig.VERSION_NAME, shown in Settings.
+        buildConfig = true
     }
 
     compileOptions {
