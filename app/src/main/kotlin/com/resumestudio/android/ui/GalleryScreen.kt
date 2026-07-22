@@ -23,13 +23,20 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Draw
+import androidx.compose.material.icons.filled.Print
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -283,14 +290,19 @@ fun TemplatePreviewScreen(
     onBack: () -> Unit,
     onApply: () -> Unit,
     onShare: () -> Unit,
+    onScan: () -> Unit = {},
+    onSignature: () -> Unit = {},
+    onPrint: () -> Unit = {},
+    onCopyText: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val isCurrent = document.template == template
+    var pageIndex by remember(template, document) { mutableStateOf(0) }
     val cacheDir = LocalContext.current.cacheDir
 
-    val page by produceState<ResumePageRasterizer.Page?>(null, template, document) {
+    val page by produceState<ResumePageRasterizer.Page?>(null, template, document, pageIndex) {
         value = withContext(Dispatchers.Default) {
-            ResumePageRasterizer(cacheDir).rasterize(document.copy(template = template), 0, widthPx = 1400)
+            ResumePageRasterizer(cacheDir).rasterize(document.copy(template = template), pageIndex, widthPx = 1400)
         }
     }
 
@@ -325,10 +337,43 @@ fun TemplatePreviewScreen(
         Text(
             template.plan.summary(),
             fontSize = 11.5.sp, color = Theme.mutedInk(),
-            modifier = Modifier.padding(bottom = 12.dp),
+            modifier = Modifier.padding(bottom = 10.dp),
         )
 
+        // The actions iOS keeps in the preview toolbar. A row rather than an
+        // overflow menu: on a phone these are the reasons the screen is open,
+        // and burying them behind a kebab costs a tap each time.
+        Row(
+            Modifier.fillMaxWidth().padding(bottom = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            ToolAction(Icons.Filled.Search, "Scan", accent, Modifier.weight(1f), onScan)
+            ToolAction(Icons.Filled.Draw, "Sign", accent, Modifier.weight(1f), onSignature)
+            ToolAction(Icons.Filled.Print, "Print", accent, Modifier.weight(1f), onPrint)
+            ToolAction(Icons.Filled.ContentCopy, "Copy", accent, Modifier.weight(1f), onCopyText)
+        }
+
         PagePreview(page?.bitmap, accent)
+
+        page?.takeIf { it.pageCount > 1 }?.let { rendered ->
+            Row(
+                Modifier.fillMaxWidth().padding(top = 8.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                PageStep("Previous page", Icons.AutoMirrored.Filled.KeyboardArrowLeft, pageIndex > 0) {
+                    pageIndex -= 1
+                }
+                Text(
+                    "Page ${pageIndex + 1} of ${rendered.pageCount}",
+                    fontSize = 12.sp, color = Theme.mutedInk(),
+                    modifier = Modifier.padding(horizontal = 14.dp),
+                )
+                PageStep("Next page", Icons.AutoMirrored.Filled.KeyboardArrowRight, pageIndex < rendered.pageCount - 1) {
+                    pageIndex += 1
+                }
+            }
+        }
         Spacer(Modifier.height(14.dp))
 
         // Choosing the template is the point of standing on this screen, so it
@@ -351,6 +396,52 @@ fun TemplatePreviewScreen(
             )
         }
         Spacer(Modifier.height(24.dp))
+    }
+}
+
+@Composable
+private fun ToolAction(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    accent: Color,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Column(
+        modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(Theme.card())
+            .border(1.dp, Theme.hairline(), RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick)
+            .padding(vertical = 9.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(3.dp),
+    ) {
+        Icon(icon, null, tint = accent, modifier = Modifier.size(17.dp))
+        Text(label, fontSize = 10.sp, color = Theme.inkSoft())
+    }
+}
+
+@Composable
+private fun PageStep(
+    description: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    enabled: Boolean,
+    onClick: () -> Unit,
+) {
+    Box(
+        Modifier
+            .size(34.dp)
+            .clip(RoundedCornerShape(17.dp))
+            .background(if (enabled) Theme.card() else Theme.muted())
+            .clickable(enabled = enabled, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(
+            icon, description,
+            tint = if (enabled) Theme.ink() else Theme.mutedInk(),
+            modifier = Modifier.size(18.dp),
+        )
     }
 }
 

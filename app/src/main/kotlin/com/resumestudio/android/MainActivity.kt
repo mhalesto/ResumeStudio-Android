@@ -63,6 +63,8 @@ import com.resumestudio.android.ui.ResumeLibraryScreen
 import com.resumestudio.android.ui.CoverLetterScreen
 import com.resumestudio.android.ui.FloatingCareerCoach
 import com.resumestudio.android.ui.SettingsScreen
+import com.resumestudio.android.ui.ResumePreviewScreen
+import com.resumestudio.android.ui.SignatureScreen
 import com.resumestudio.android.ui.SplashScreen
 import com.resumestudio.android.ui.GalleryScreen
 import com.resumestudio.android.ui.HomeScreen
@@ -139,6 +141,7 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
     var browsingLibrary by rememberSaveable { mutableStateOf(false) }
     var scanning by rememberSaveable { mutableStateOf(false) }
     var vaultOpen by rememberSaveable { mutableStateOf(false) }
+    var signing by rememberSaveable { mutableStateOf(false) }
 
     val context = LocalContext.current
 
@@ -162,16 +165,55 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
 
         if (template != null) {
             BackHandler { previewing = null }
-            TemplatePreviewScreen(
-                template = template,
-                document = document,
+            ResumePreviewScreen(
+                document = document.copy(template = template),
                 accent = accentColor,
                 onBack = { previewing = null },
-                onApply = {
-                    viewModel.setTemplate(template)
-                    previewing = null
+                onPickTemplate = {
+                    viewModel.setTemplate(it)
+                    previewing = it.wireName
                 },
-                onShare = { ResumeExporter.share(context, document.copy(template = template)) },
+                onPickAccent = viewModel::setAccent,
+                onShare = { ResumeExporter.share(context, it) },
+                onSavePdf = { ResumeExporter.share(context, it) },
+                onSaveDocx = { ResumeExporter.shareDocx(context, it) },
+                onScan = { previewing = null; scanning = true },
+                onSignature = { previewing = null; signing = true },
+                onAttachments = {
+                    Toast.makeText(context, "Attachments are not on Android yet.", Toast.LENGTH_SHORT).show()
+                },
+                onTrackableLink = {
+                    Toast.makeText(
+                        context,
+                        "Trackable links need the hosted backend, which is not wired on Android yet.",
+                        Toast.LENGTH_LONG,
+                    ).show()
+                },
+                onPrint = { ResumeExporter.print(context, it) },
+                onCopyText = {
+                    val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE)
+                        as android.content.ClipboardManager
+                    clipboard.setPrimaryClip(
+                        android.content.ClipData.newPlainText("Résumé", ResumeExporter.plainText(it)),
+                    )
+                    Toast.makeText(context, "Résumé text copied.", Toast.LENGTH_SHORT).show()
+                },
+                modifier = Modifier.fillMaxSize(),
+            )
+            return@ResumeStudioTheme
+        }
+
+        if (signing) {
+            BackHandler { signing = false }
+            SignatureScreen(
+                existing = document.signature,
+                pageCount = 1,
+                accent = accentColor,
+                onSave = { signature ->
+                    viewModel.edit { it.copy(signature = signature) }
+                    signing = false
+                },
+                onBack = { signing = false },
                 modifier = Modifier.fillMaxSize(),
             )
             return@ResumeStudioTheme

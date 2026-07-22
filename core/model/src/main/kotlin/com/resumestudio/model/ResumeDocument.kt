@@ -30,6 +30,7 @@ data class ResumeDocument(
     val photo: ByteArray? = null,
     val photoCrop: PhotoCrop? = null,
     val isPhotoVisible: Boolean = true,
+    val signature: ResumeSignature? = null,
 ) {
     val showsPortrait: Boolean get() = isPhotoVisible && photo != null
 
@@ -92,7 +93,8 @@ data class ResumeDocument(
             layout == other.layout &&
             (photo?.contentEquals(other.photo) ?: (other.photo == null)) &&
             photoCrop == other.photoCrop &&
-            isPhotoVisible == other.isPhotoVisible
+            isPhotoVisible == other.isPhotoVisible &&
+            signature == other.signature
     }
 
     override fun hashCode(): Int {
@@ -110,6 +112,7 @@ data class ResumeDocument(
         result = 31 * result + (photo?.contentHashCode() ?: 0)
         result = 31 * result + (photoCrop?.hashCode() ?: 0)
         result = 31 * result + isPhotoVisible.hashCode()
+        result = 31 * result + (signature?.hashCode() ?: 0)
         return result
     }
 

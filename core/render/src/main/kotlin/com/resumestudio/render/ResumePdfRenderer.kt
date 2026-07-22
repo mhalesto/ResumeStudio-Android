@@ -12,6 +12,7 @@ import com.resumestudio.model.CompetencyStyle
 import com.resumestudio.model.ExperienceStyle
 import com.resumestudio.model.ResumeContentBlock
 import com.resumestudio.model.ResumeDocument
+import com.resumestudio.model.ResumeSignaturePlacement
 import com.resumestudio.model.SideColumn
 import com.resumestudio.model.TemplatePlan
 import java.io.ByteArrayOutputStream
@@ -159,7 +160,10 @@ class ResumePdfRenderer {
             }
 
         private fun newPage() {
-            page?.let { pdf.finishPage(it) }
+            page?.let {
+                drawSignatureIfThisIsItsPage()
+                pdf.finishPage(it)
+            }
             pageNumber += 1
             // Rounded, not truncated. `PageInfo` only takes whole points, and A4
             // is 841.89 tall — truncating quietly loses most of a point off every
@@ -197,8 +201,62 @@ class ResumePdfRenderer {
             }
         }
 
+        /**
+         * Lays the signature over the page it was assigned to.
+         *
+         * Called as each page is finished rather than once at the end. A page
+         * cannot be reopened after `finishPage`, so a signature bound for page
+         * one has to be drawn while page one is still the open one — doing this
+         * last meant it was only ever drawn on single-page documents.
+         *
+         * A signature assigned to a page the document turned out not to have
+         * falls onto the final page rather than being dropped in silence.
+         */
+        private fun drawSignatureIfThisIsItsPage(isFinalPage: Boolean = false) {
+            val signature = document.signature?.normalized() ?: return
+            val strokes = signature.strokes.filter { it.points.size > 1 }
+            if (strokes.isEmpty()) return
+
+            val thisPage = pageNumber - 1
+            val wanted = signature.pageIndex
+            val belongsHere = wanted == thisPage || (isFinalPage && wanted > thisPage)
+            if (!belongsHere) return
+
+            val width = signature.widthPoints.toFloat()
+            // Height follows the mark's own aspect, so a wide flourish and a
+            // compact initial are not both squashed into the same box.
+            val height = width * 0.42f
+            val left = when (signature.placement) {
+                ResumeSignaturePlacement.LOWER_LEADING -> mainRect.left
+                ResumeSignaturePlacement.LOWER_CENTER -> mainRect.centerX() - width / 2f
+                ResumeSignaturePlacement.LOWER_TRAILING -> mainRect.right - width
+            }
+            val top = contentBottom - height - 6f
+
+            stroke.color = theme.ink
+            stroke.strokeWidth = 1.5f
+            stroke.strokeCap = Paint.Cap.ROUND
+            stroke.strokeJoin = Paint.Join.ROUND
+
+            strokes.forEach { mark ->
+                val path = android.graphics.Path()
+                mark.points.forEachIndexed { index, point ->
+                    val x = left + point.x * width
+                    val y = top + point.y * height
+                    if (index == 0) path.moveTo(x, y) else path.lineTo(x, y)
+                }
+                canvas.drawPath(path, stroke)
+            }
+
+            stroke.strokeWidth = 0.6f
+            stroke.strokeCap = Paint.Cap.BUTT
+        }
+
         override fun close() {
-            page?.let { pdf.finishPage(it) }
+            page?.let {
+                drawSignatureIfThisIsItsPage(isFinalPage = true)
+                pdf.finishPage(it)
+            }
             page = null
         }
 

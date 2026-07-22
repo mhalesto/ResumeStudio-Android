@@ -6,6 +6,7 @@ import androidx.core.content.FileProvider
 import com.resumestudio.model.CoverLetterDocument
 import com.resumestudio.model.ResumeDocument
 import com.resumestudio.render.CoverLetterPdfRenderer
+import com.resumestudio.render.ResumeDocxRenderer
 import com.resumestudio.render.ResumePdfRenderer
 import java.io.File
 
@@ -68,6 +69,120 @@ object ResumeExporter {
         file.writeBytes(ResumePdfRenderer().render(document))
         return file
     }
+
+    /**
+     * Hands the PDF to Android's print stack.
+     *
+     * `PrintManager` takes a document adapter rather than a file, so the export
+     * is written first and streamed from there — the same bytes that would be
+     * shared, rather than a second rendering that could differ from it.
+     */
+    fun print(context: Context, document: ResumeDocument) {
+        val file = render(context, document)
+        val manager = context.getSystemService(Context.PRINT_SERVICE) as android.print.PrintManager
+        manager.print(
+            document.suggestedFilename,
+            object : android.print.PrintDocumentAdapter() {
+                override fun onLayout(
+                    old: android.print.PrintAttributes?,
+                    new: android.print.PrintAttributes?,
+                    signal: android.os.CancellationSignal?,
+                    callback: LayoutResultCallback,
+                    extras: android.os.Bundle?,
+                ) {
+                    if (signal?.isCanceled == true) {
+                        callback.onLayoutCancelled()
+                        return
+                    }
+                    callback.onLayoutFinished(
+                        android.print.PrintDocumentInfo.Builder("${document.suggestedFilename}.pdf")
+                            .setContentType(android.print.PrintDocumentInfo.CONTENT_TYPE_DOCUMENT)
+                            .build(),
+                        true,
+                    )
+                }
+
+                override fun onWrite(
+                    pages: Array<out android.print.PageRange>?,
+                    destination: android.os.ParcelFileDescriptor?,
+                    signal: android.os.CancellationSignal?,
+                    callback: WriteResultCallback,
+                ) {
+                    runCatching {
+                        file.inputStream().use { input ->
+                            java.io.FileOutputStream(destination?.fileDescriptor).use { output ->
+                                input.copyTo(output)
+                            }
+                        }
+                    }.fold(
+                        onSuccess = { callback.onWriteFinished(arrayOf(android.print.PageRange.ALL_PAGES)) },
+                        onFailure = { callback.onWriteFailed(it.message) },
+                    )
+                }
+            },
+            null,
+        )
+    }
+
+    /**
+     * The résumé as plain text, for pasting into a form that wants it typed out.
+     *
+     * Built from the document rather than scraped back out of the PDF: the PDF
+     * has columns and a reading order, and what a form wants is the content.
+     */
+    fun plainText(document: ResumeDocument): String = buildString {
+        appendLine(document.personal.fullName)
+        if (document.personal.headline.isNotBlank()) appendLine(document.personal.headline)
+        listOf(document.personal.email, document.personal.phone)
+            .filter { it.isNotBlank() }
+            .takeIf { it.isNotEmpty() }
+            ?.let { appendLine(it.joinToString(" · ")) }
+
+        if (document.professionalProfile.isNotBlank()) {
+            appendLine()
+            appendLine("PROFESSIONAL PROFILE")
+            appendLine(document.professionalProfile)
+        }
+        if (document.competencies.any { it.isNotBlank() }) {
+            appendLine()
+            appendLine("CORE COMPETENCIES")
+            document.competencies.filter { it.isNotBlank() }.forEach { appendLine("• $it") }
+        }
+        if (document.experience.isNotEmpty()) {
+            appendLine()
+            appendLine("PROFESSIONAL EXPERIENCE")
+            document.experience.forEach { entry ->
+                appendLine()
+                appendLine(listOf(entry.role, entry.company, entry.period).filter { it.isNotBlank() }.joinToString(" · "))
+                entry.highlights.filter { it.isNotBlank() }.forEach { appendLine("• $it") }
+            }
+        }
+        if (document.education.isNotEmpty()) {
+            appendLine()
+            appendLine("EDUCATION")
+            document.education.forEach {
+                appendLine(listOf(it.qualification, it.institution, it.period).filter { s -> s.isNotBlank() }.joinToString(" · "))
+                if (it.details.isNotBlank()) appendLine(it.details)
+            }
+        }
+        if (document.references.isNotEmpty()) {
+            appendLine()
+            appendLine("REFERENCES")
+            document.references.forEach {
+                appendLine(listOf(it.name, it.company, it.email, it.phone).filter { s -> s.isNotBlank() }.joinToString(" · "))
+            }
+        }
+    }.trim()
+
+    /** The résumé as an editable Word document, saved beside the PDF. */
+    fun renderDocx(context: Context, document: ResumeDocument): File {
+        val file = File(exportDirectory(context), "${document.suggestedFilename}.docx")
+        file.writeBytes(ResumeDocxRenderer.render(document))
+        return file
+    }
+
+    fun shareDocx(context: Context, document: ResumeDocument) =
+        share(context, renderDocx(context, document))
 
     private fun exportDirectory(context: Context): File =
         File(context.cacheDir, "exports").apply {
