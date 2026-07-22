@@ -3,6 +3,8 @@ package com.resumestudio.android
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.resumestudio.data.AnswerVaultStore
+import com.resumestudio.data.CareerCoachStore
+import com.resumestudio.data.ResumeAIClient
 import com.resumestudio.data.ApplicationStore
 import com.resumestudio.data.CoverLetterStore
 import com.resumestudio.data.ResumeStore
@@ -10,6 +12,9 @@ import com.resumestudio.data.ResumeInterchange
 import com.resumestudio.data.importDocument
 import com.resumestudio.data.merge
 import com.resumestudio.model.ApplicationAnswer
+import com.resumestudio.model.CareerCoachMessage
+import com.resumestudio.model.CareerCoachMessageRole
+import com.resumestudio.model.coachContext
 import com.resumestudio.model.CareerMomentumMission
 import com.resumestudio.model.CoverLetterDocument
 import com.resumestudio.model.CareerMomentumPillar
@@ -21,6 +26,8 @@ import com.resumestudio.model.ResumeFontChoice
 import com.resumestudio.model.ResumePaperSize
 import com.resumestudio.model.ResumeDocument
 import com.resumestudio.model.ResumeTemplate
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,6 +47,22 @@ class ResumeViewModel(application: Application) : AndroidViewModel(application) 
     private val applicationStore = ApplicationStore(File(application.filesDir, "applications.json"))
     private val coverLetterStore = CoverLetterStore(File(application.filesDir, "cover-letter.json"))
     private val vaultStore = AnswerVaultStore(File(application.filesDir, "answers.json"))
+    private val coachStore = CareerCoachStore(File(application.filesDir, "coach.json"))
+
+    /**
+     * The AI endpoint, pointed at the same backend iOS uses.
+     *
+     * Tokens come back null because Firebase is not wired on Android yet, so the
+     * client refuses to send rather than firing unauthenticated requests that
+     * would look like they worked until the server started rejecting them.
+     */
+    private val ai = ResumeAIClient(
+        baseUrl = AI_BASE_URL,
+        clientId = installationId(application),
+        tokens = { ResumeAIClient.Tokens(idToken = null, appCheck = null) },
+    )
+
+    val coachMessages = coachStore.messages
 
     val answers = vaultStore.answers
 
@@ -87,6 +110,61 @@ class ResumeViewModel(application: Application) : AndroidViewModel(application) 
     fun setPaperSize(size: ResumePaperSize) = edit { it.copy(layout = it.layout.copy(paperSize = size)) }
 
     fun setFontChoice(choice: ResumeFontChoice) = edit { it.copy(layout = it.layout.copy(fontChoice = choice)) }
+
+    // --- career coach -------------------------------------------------------
+
+    private val _coachThinking = MutableStateFlow(false)
+    val coachThinking: StateFlow<Boolean> = _coachThinking.asStateFlow()
+
+    private val _coachError = MutableStateFlow<String?>(null)
+    val coachError: StateFlow<String?> = _coachError.asStateFlow()
+
+    private val _coachSuggestions = MutableStateFlow(DEFAULT_PROMPTS)
+    val coachSuggestions: StateFlow<List<String>> = _coachSuggestions.asStateFlow()
+
+    fun openCoach() = coachStore.welcome(document.personal.fullName)
+
+    fun clearCoach() {
+        coachStore.clear()
+        _coachError.value = null
+        _coachSuggestions.value = DEFAULT_PROMPTS
+        openCoach()
+    }
+
+    fun sendToCoach(text: String) {
+        if (text.isBlank() || _coachThinking.value) return
+        coachStore.append(CareerCoachMessage(role = CareerCoachMessageRole.USER, content = text))
+        _coachError.value = null
+        _coachThinking.value = true
+
+        viewModelScope.launch {
+            val context = coachContext(
+                document = document,
+                title = state.value.active?.title.orEmpty(),
+                applications = applicationStore.applications.value,
+            )
+            when (val result = ai.careerCoach(context, coachStore.messages.value)) {
+                is ResumeAIClient.Result.Success -> {
+                    coachStore.append(
+                        CareerCoachMessage(
+                            role = CareerCoachMessageRole.ASSISTANT,
+                            content = result.value.reply,
+                        ),
+                    )
+                    if (result.value.suggestedPrompts.isNotEmpty()) {
+                        _coachSuggestions.value = result.value.suggestedPrompts
+                    }
+                }
+                is ResumeAIClient.Result.Failed -> _coachError.value = result.message
+                is ResumeAIClient.Result.Offline ->
+                    _coachError.value = "No connection. The coach needs one; everything else here does not."
+                ResumeAIClient.Result.Unauthenticated ->
+                    _coachError.value = "The coach needs an account. Sign-in is not on Android yet — " +
+                        "it arrives with Firebase Auth, and this screen is ready for it."
+            }
+            _coachThinking.value = false
+        }
+    }
 
     // --- answer vault -------------------------------------------------------
 
@@ -153,5 +231,21 @@ class ResumeViewModel(application: Application) : AndroidViewModel(application) 
 
     private companion object {
         const val KEY_INTRO_DISMISSED = "introDismissed"
+
+        /** The same Cloud Functions host the iOS build points at. */
+        const val AI_BASE_URL = "https://api-3wnrjfvyeq-uc.a.run.app"
+
+        val DEFAULT_PROMPTS = listOf(
+            "How is my résumé looking?",
+            "Rewrite my summary",
+            "What should I ask in an interview?",
+        )
+
+        /** Stable per-install id, matching what iOS sends as `clientID`. */
+        fun installationId(application: Application): String {
+            val prefs = application.getSharedPreferences("identity", android.content.Context.MODE_PRIVATE)
+            return prefs.getString("installationID", null) ?: java.util.UUID.randomUUID().toString()
+                .also { prefs.edit().putString("installationID", it).apply() }
+        }
     }
 }

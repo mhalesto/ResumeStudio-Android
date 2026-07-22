@@ -37,6 +37,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,6 +56,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.resumestudio.android.ui.EditorScreen
 import com.resumestudio.android.ui.AnswerVaultScreen
+import com.resumestudio.android.ui.CareerCoachScreen
 import com.resumestudio.android.ui.ApplicationsScreen
 import com.resumestudio.android.ui.RecruiterScanScreen
 import com.resumestudio.android.ui.ResumeLibraryScreen
@@ -113,6 +115,10 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
     val applications by viewModel.applications.collectAsState()
     val coverLetter by viewModel.coverLetter.collectAsState()
     val answers by viewModel.answers.collectAsState()
+    val coachMessages by viewModel.coachMessages.collectAsState()
+    val coachThinking by viewModel.coachThinking.collectAsState()
+    val coachError by viewModel.coachError.collectAsState()
+    val coachSuggestions by viewModel.coachSuggestions.collectAsState()
     val document = library.document
     val accent = document.accent
     val momentum = remember(applications) { viewModel.momentum() }
@@ -166,6 +172,23 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
                     previewing = null
                 },
                 onShare = { ResumeExporter.share(context, document.copy(template = template)) },
+                modifier = Modifier.fillMaxSize(),
+            )
+            return@ResumeStudioTheme
+        }
+
+        if (coaching) {
+            LaunchedEffect(Unit) { viewModel.openCoach() }
+            BackHandler { coaching = false }
+            CareerCoachScreen(
+                messages = coachMessages,
+                suggestions = coachSuggestions,
+                isThinking = coachThinking,
+                error = coachError,
+                accent = accentColor,
+                onSend = viewModel::sendToCoach,
+                onClear = viewModel::clearCoach,
+                onBack = { coaching = false },
                 modifier = Modifier.fillMaxSize(),
             )
             return@ResumeStudioTheme
