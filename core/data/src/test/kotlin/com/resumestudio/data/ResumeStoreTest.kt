@@ -245,3 +245,63 @@ class ResumeLibraryTest {
         assertEquals("Tailored for Acme", reopened.state.value.active?.title)
     }
 }
+
+/** The door between the two apps. */
+class ResumeInterchangeTest {
+
+    @get:Rule val folder = TemporaryFolder()
+
+    @Test
+    fun `an exported library reads back as a library`() {
+        val store = ResumeStore(File(folder.newFolder(), "draft.json"))
+        store.duplicateActive()
+
+        val result = ResumeInterchange.import(ResumeInterchange.exportLibrary(store.state.value))
+
+        assertTrue(result is ResumeInterchange.ImportResult.Library)
+        assertEquals(2, (result as ResumeInterchange.ImportResult.Library).archive.resumes.size)
+    }
+
+    @Test
+    fun `a bare document from an older export still opens`() {
+        // Someone's only résumé may be in this layout; refusing it would be the
+        // worst possible moment to be strict about a format.
+        val result = ResumeInterchange.import(ResumeJson.encode(ResumeDocument.example))
+        assertTrue(result is ResumeInterchange.ImportResult.Single)
+    }
+
+    @Test
+    fun `something that is not an export says so rather than throwing`() {
+        assertTrue(ResumeInterchange.import("{ nope") is ResumeInterchange.ImportResult.Failed)
+        assertTrue(ResumeInterchange.import("") is ResumeInterchange.ImportResult.Failed)
+    }
+
+    @Test
+    fun `importing merges rather than replacing`() {
+        val target = ResumeStore(File(folder.newFolder(), "draft.json"))
+        target.edit { it.copy(personal = it.personal.copy(fullName = "Only On This Device")) }
+
+        val source = ResumeStore(File(folder.newFolder(), "draft.json"))
+        source.edit { it.copy(personal = it.personal.copy(fullName = "From The Backup")) }
+        val exported = ResumeInterchange.exportLibrary(source.state.value)
+
+        val added = target.merge((ResumeInterchange.import(exported) as ResumeInterchange.ImportResult.Library).archive)
+
+        assertEquals(1, added)
+        assertEquals(2, target.state.value.resumes.size)
+        // The résumé that was only here is the one a replace would have lost.
+        assertTrue(target.state.value.resumes.any { it.document.personal.fullName == "Only On This Device" })
+        // And the newcomer is what the user is looking for after an import.
+        assertEquals("From The Backup", target.document.personal.fullName)
+    }
+
+    @Test
+    fun `re-importing the same backup adds nothing`() {
+        val store = ResumeStore(File(folder.newFolder(), "draft.json"))
+        val exported = ResumeInterchange.exportLibrary(store.state.value)
+        val archive = (ResumeInterchange.import(exported) as ResumeInterchange.ImportResult.Library).archive
+
+        assertEquals(0, store.merge(archive))
+        assertEquals(1, store.state.value.resumes.size)
+    }
+}

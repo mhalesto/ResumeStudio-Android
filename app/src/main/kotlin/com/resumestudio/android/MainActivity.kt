@@ -2,7 +2,10 @@ package com.resumestudio.android
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
@@ -51,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.resumestudio.android.ui.EditorScreen
+import com.resumestudio.android.ui.AnswerVaultScreen
 import com.resumestudio.android.ui.ApplicationsScreen
 import com.resumestudio.android.ui.RecruiterScanScreen
 import com.resumestudio.android.ui.ResumeLibraryScreen
@@ -97,6 +101,7 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
     val coachIntroDismissed by viewModel.coachIntroDismissed.collectAsState()
     val applications by viewModel.applications.collectAsState()
     val coverLetter by viewModel.coverLetter.collectAsState()
+    val answers by viewModel.answers.collectAsState()
     val document = library.document
     val accent = document.accent
     val momentum = remember(applications) { viewModel.momentum() }
@@ -109,10 +114,26 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
     var writingLetter by rememberSaveable { mutableStateOf(false) }
     var browsingLibrary by rememberSaveable { mutableStateOf(false) }
     var scanning by rememberSaveable { mutableStateOf(false) }
+    var vaultOpen by rememberSaveable { mutableStateOf(false) }
+
+    val context = LocalContext.current
+
+    // The system picker is the only way to read a file the app does not own,
+    // and it grants access to exactly the one the user chose — no storage
+    // permission, and nothing else on the device becomes readable.
+    val importPicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument(),
+    ) { uri ->
+        uri ?: return@rememberLauncherForActivityResult
+        val text = runCatching {
+            context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
+        }.getOrNull()
+        val message = if (text == null) "Could not read that file." else viewModel.importLibrary(text)
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+    }
 
     ResumeStudioTheme(accent = accent) {
         val accentColor = LocalAccent.current
-        val context = LocalContext.current
         val template = previewing?.let(ResumeTemplate::from)
 
         if (template != null) {
@@ -127,6 +148,18 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
                     previewing = null
                 },
                 onShare = { ResumeExporter.share(context, document.copy(template = template)) },
+                modifier = Modifier.fillMaxSize(),
+            )
+            return@ResumeStudioTheme
+        }
+
+        if (vaultOpen) {
+            BackHandler { vaultOpen = false }
+            AnswerVaultScreen(
+                answers = answers,
+                accent = accentColor,
+                onUpdate = viewModel::updateAnswer,
+                onBack = { vaultOpen = false },
                 modifier = Modifier.fillMaxSize(),
             )
             return@ResumeStudioTheme
@@ -253,6 +286,11 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
                             }
                         },
                         versionName = BuildConfig.VERSION_NAME,
+                        onOpenVault = { vaultOpen = true },
+                        onExport = { exportLibrary(context, viewModel.exportLibrary()) },
+                        onImport = { importPicker.launch(arrayOf("application/json", "text/plain", "*/*")) },
+                        answersReady = answers.count { it.isUsable },
+                        answersTotal = answers.size,
                     )
                 }
 
@@ -269,6 +307,30 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
                 )
             }
         }
+    }
+}
+
+/** Writes the library to the cache and hands it to a share sheet. */
+private fun exportLibrary(context: android.content.Context, json: String) {
+    runCatching {
+        val directory = java.io.File(context.cacheDir, "exports").apply { mkdirs() }
+        val file = java.io.File(directory, "ResumeStudio Library.json")
+        file.writeText(json)
+        val uri = androidx.core.content.FileProvider.getUriForFile(
+            context, context.packageName + ".fileprovider", file,
+        )
+        context.startActivity(
+            android.content.Intent.createChooser(
+                android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                    type = "application/json"
+                    putExtra(android.content.Intent.EXTRA_STREAM, uri)
+                    addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                },
+                "Export library",
+            ).apply { addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION) },
+        )
+    }.onFailure {
+        Toast.makeText(context, "Could not export: ${it.message}", Toast.LENGTH_LONG).show()
     }
 }
 

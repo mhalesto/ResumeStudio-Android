@@ -138,6 +138,21 @@ class ResumeStore(private val file: File) {
         save()
     }
 
+    /**
+     * Adds drafts from an import and selects the first of them.
+     *
+     * Selecting the newcomer is the point: somebody who has just imported a
+     * backup is looking for what they imported, not for what was already open.
+     */
+    fun importDrafts(drafts: List<ResumeDraft>) {
+        if (drafts.isEmpty()) return
+        _state.value = _state.value.copy(
+            resumes = _state.value.resumes + drafts,
+            activeResumeID = drafts.first().id,
+        )
+        save()
+    }
+
     fun select(id: String) {
         if (_state.value.resumes.any { it.id == id }) {
             _state.value = _state.value.copy(activeResumeID = id)

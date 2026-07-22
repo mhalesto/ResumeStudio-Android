@@ -2,9 +2,14 @@ package com.resumestudio.android
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import com.resumestudio.data.AnswerVaultStore
 import com.resumestudio.data.ApplicationStore
 import com.resumestudio.data.CoverLetterStore
 import com.resumestudio.data.ResumeStore
+import com.resumestudio.data.ResumeInterchange
+import com.resumestudio.data.importDocument
+import com.resumestudio.data.merge
+import com.resumestudio.model.ApplicationAnswer
 import com.resumestudio.model.CareerMomentumMission
 import com.resumestudio.model.CoverLetterDocument
 import com.resumestudio.model.CareerMomentumPillar
@@ -34,6 +39,9 @@ class ResumeViewModel(application: Application) : AndroidViewModel(application) 
     private val store = ResumeStore(File(application.filesDir, "draft.json"))
     private val applicationStore = ApplicationStore(File(application.filesDir, "applications.json"))
     private val coverLetterStore = CoverLetterStore(File(application.filesDir, "cover-letter.json"))
+    private val vaultStore = AnswerVaultStore(File(application.filesDir, "answers.json"))
+
+    val answers = vaultStore.answers
 
     val coverLetter = coverLetterStore.document
 
@@ -79,6 +87,35 @@ class ResumeViewModel(application: Application) : AndroidViewModel(application) 
     fun setPaperSize(size: ResumePaperSize) = edit { it.copy(layout = it.layout.copy(paperSize = size)) }
 
     fun setFontChoice(choice: ResumeFontChoice) = edit { it.copy(layout = it.layout.copy(fontChoice = choice)) }
+
+    // --- answer vault -------------------------------------------------------
+
+    fun updateAnswer(answer: ApplicationAnswer) = vaultStore.update(answer)
+
+    // --- backup -------------------------------------------------------------
+
+    /** The whole library as JSON, in the shape iOS's importer expects. */
+    fun exportLibrary(): String = ResumeInterchange.exportLibrary(store.state.value)
+
+    /**
+     * Reads a library or a single document out of [text].
+     *
+     * Merged in rather than replacing: somebody importing a backup usually
+     * wants both, and the résumé they would lose to a replace is the one they
+     * did not realise was only on this device.
+     */
+    fun importLibrary(text: String): String = when (val result = ResumeInterchange.import(text)) {
+        is ResumeInterchange.ImportResult.Library -> {
+            val added = store.merge(result.archive)
+            if (added == 0) "Nothing new — those résumés are already here."
+            else "Imported $added résumé${if (added == 1) "" else "s"}."
+        }
+        is ResumeInterchange.ImportResult.Single -> {
+            store.importDocument(result.document)
+            "Imported one résumé."
+        }
+        is ResumeInterchange.ImportResult.Failed -> result.reason
+    }
 
     // --- cover letter ------------------------------------------------------
 

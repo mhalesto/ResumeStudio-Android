@@ -23,7 +23,9 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Extension
+import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MailOutline
@@ -64,6 +66,11 @@ fun SettingsScreen(
     onPickPaper: (ResumePaperSize) -> Unit,
     onPickFont: (ResumeFontChoice) -> Unit,
     onOpenUrl: (String) -> Unit,
+    onOpenVault: () -> Unit,
+    onExport: () -> Unit,
+    onImport: () -> Unit,
+    answersReady: Int,
+    answersTotal: Int,
     versionName: String,
     modifier: Modifier = Modifier,
 ) {
@@ -155,8 +162,24 @@ fun SettingsScreen(
 
         item {
             SettingsSection("Integrations") {
-                SettingsRow("Application Answer Vault", Icons.Filled.Extension, available = false)
+                SettingsRow(
+                    "Application Answer Vault",
+                    Icons.Filled.Extension,
+                    detail = "$answersReady of $answersTotal ready",
+                    onClick = onOpenVault,
+                )
                 SettingsRow("Calendar, Mail and Share", Icons.Filled.Extension, available = false)
+            }
+        }
+
+        item {
+            SettingsSection(
+                "Backup",
+                // The shared draft.json format is worth nothing without a door.
+                "Exports in the same format iOS reads, so a résumé can move between the two apps.",
+            ) {
+                SettingsRow("Export library", Icons.Filled.Upload, onClick = onExport)
+                SettingsRow("Import from a backup", Icons.Filled.Download, onClick = onImport)
             }
         }
 
