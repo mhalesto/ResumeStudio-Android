@@ -37,7 +37,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.resumestudio.android.R
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import com.resumestudio.model.CareerMomentumSnapshot
+import com.resumestudio.model.CoverLetterDocument
+import com.resumestudio.model.CoverLetterTemplate
+import com.resumestudio.render.CoverLetterPdfRenderer
+import com.resumestudio.render.TemplateThumbnailCache
+import com.resumestudio.render.family
 import com.resumestudio.model.TodayAction
 import com.resumestudio.model.ResumeDocument
 import com.resumestudio.model.ResumeTemplate
@@ -61,6 +78,8 @@ fun HomeScreen(
     applicationCount: Int,
     todayActions: List<TodayAction>,
     momentum: CareerMomentumSnapshot,
+    coverLetter: CoverLetterDocument,
+    thumbnails: TemplateThumbnailCache,
     onOpenGallery: () -> Unit,
     onOpenApplications: () -> Unit,
     onOpenCoverLetter: () -> Unit,
@@ -92,7 +111,8 @@ fun HomeScreen(
                 onOpenGallery, onOpenApplications, onOpenCoverLetter, onOpenLibrary, onOpenScan,
             )
         }
-        item { Templates(accent, onOpenGallery, onOpenTemplate) }
+        item { Templates(accent, document, thumbnails, onOpenGallery, onOpenTemplate) }
+        item { CoverLetterShelf(accent, coverLetter, onOpenCoverLetter) }
         item { RecentlyEdited(document, accent, onEdit) }
         item { PrivacyNote() }
     }
@@ -341,68 +361,196 @@ private fun WorkspaceCard(
 @Composable
 private fun Templates(
     accent: Color,
+    document: ResumeDocument,
+    thumbnails: TemplateThumbnailCache,
     onOpenGallery: () -> Unit,
     onOpenTemplate: (ResumeTemplate) -> Unit,
 ) {
-    val featured = androidx.compose.runtime.remember { listOf(ResumeTemplate.ATLAS, ResumeTemplate.NOIR, ResumeTemplate.GAUGE, ResumeTemplate.MODERN) }
+    // A row you push through rather than a list you scroll past. Choosing a
+    // template is a browsing decision, and browsing is horizontal — the same
+    // shape the gallery uses on iOS.
+    val featured = remember {
+        listOf(
+            ResumeTemplate.ATLAS, ResumeTemplate.NOIR, ResumeTemplate.GAUGE,
+            ResumeTemplate.MODERN, ResumeTemplate.ALCOVE, ResumeTemplate.APERTURE,
+            ResumeTemplate.CHRONICLE, ResumeTemplate.GENEVA,
+        )
+    }
 
-    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
             Box(Modifier.widthIn(max = 240.dp)) {
                 SectionHeading("Templates", "${TemplateCatalogue.templateCount} layouts, one shared vocabulary.")
             }
             Text(
                 "See all",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = accent,
+                fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = accent,
                 modifier = Modifier.clickable(onClick = onOpenGallery),
             )
         }
-        featured.forEach { template ->
-            TemplateStrip(template, accent) { onOpenTemplate(template) }
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            items(featured, key = { it.wireName }) { template ->
+                TemplateTile(template, document, thumbnails, accent) { onOpenTemplate(template) }
+            }
         }
     }
 }
 
 @Composable
-private fun TemplateStrip(template: ResumeTemplate, accent: Color, onClick: () -> Unit) {
-    val plan = template.plan
-    Row(
-        Modifier.fillMaxWidth().cardSurface().clickable(onClick = onClick).padding(14.dp),
-        verticalAlignment = Alignment.CenterVertically,
+private fun TemplateTile(
+    template: ResumeTemplate,
+    document: ResumeDocument,
+    thumbnails: TemplateThumbnailCache,
+    accent: Color,
+    onClick: () -> Unit,
+) {
+    val isCurrent = template == document.template
+    val thumbnail by produceState<android.graphics.Bitmap?>(null, template, document) {
+        value = thumbnails.thumbnail(document, template)
+    }
+
+    Column(
+        Modifier.width(112.dp).clickable(onClick = onClick),
+        verticalArrangement = Arrangement.spacedBy(7.dp),
     ) {
-        // A miniature of the page's own shape: the band where the plan puts it.
         Box(
             Modifier
-                .size(width = 30.dp, height = 42.dp)
-                .clip(RoundedCornerShape(4.dp))
-                // Paper is white whatever the app's theme is doing — same rule
-                // as the gallery thumbnail; only dark-paper templates are dark.
-                .background(if (plan.darkPaper) Color(0xFF14161A) else Color.White),
+                .fillMaxWidth()
+                .aspectRatio(595f / 842f)
+                .clip(RoundedCornerShape(10.dp))
+                .background(Color.White)
+                .border(
+                    width = if (isCurrent) 2.dp else 1.dp,
+                    color = if (isCurrent) accent else Theme.hairline(),
+                    shape = RoundedCornerShape(10.dp),
+                ),
         ) {
-            (plan.body as? com.resumestudio.model.BodyLayout.Side)?.let { side ->
-                Box(
-                    Modifier
-                        .fillMaxWidth(side.column.width / 595f * 2.2f)
-                        .height(42.dp)
-                        .align(
-                            if (side.column.edge == com.resumestudio.model.SideColumn.Edge.LEADING)
-                                Alignment.CenterStart else Alignment.CenterEnd,
-                        )
-                        .background(if (side.column.prefersLightInk) Color(0xFF1F2329) else accent.copy(alpha = 0.35f)),
+            thumbnail?.let {
+                Image(
+                    bitmap = it.asImageBitmap(),
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.fillMaxSize(),
                 )
             }
         }
-        Spacer(Modifier.size(12.dp))
-        Column(Modifier.weight(1f)) {
+        Text(
+            template.wireName.replaceFirstChar { it.uppercase() },
+            fontSize = 11.5.sp,
+            fontWeight = if (isCurrent) FontWeight.SemiBold else FontWeight.Normal,
+            color = if (isCurrent) accent else Theme.ink(),
+            maxLines = 1,
+        )
+    }
+}
+
+/** The same shelf for letterheads, so the two documents browse alike. */
+@Composable
+private fun CoverLetterShelf(
+    accent: Color,
+    letter: CoverLetterDocument,
+    onOpen: () -> Unit,
+) {
+    val featured = remember {
+        listOf(
+            CoverLetterTemplate.MODERN, CoverLetterTemplate.GRADIENT, CoverLetterTemplate.EXECUTIVE,
+            CoverLetterTemplate.MONOGRAM, CoverLetterTemplate.SIDEBAR, CoverLetterTemplate.NOIR,
+            CoverLetterTemplate.CLASSIC, CoverLetterTemplate.MINIMAL,
+        )
+    }
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
+            Box(Modifier.widthIn(max = 240.dp)) {
+                SectionHeading("Cover letters", "${CoverLetterTemplate.entries.size} letterheads, paired to your templates.")
+            }
             Text(
-                template.wireName.replaceFirstChar { it.uppercase() },
-                fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Theme.ink(),
+                "Write one",
+                fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = accent,
+                modifier = Modifier.clickable(onClick = onOpen),
             )
-            Text(planSummary(template), fontSize = 11.sp, color = Theme.mutedInk(), lineHeight = 15.sp)
         }
-        Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = Theme.mutedInk(), modifier = Modifier.size(15.dp))
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            items(featured, key = { it.wireName }) { template ->
+                LetterTile(template, template == letter.template, accent, onOpen)
+            }
+        }
+    }
+}
+
+@Composable
+private fun LetterTile(
+    template: CoverLetterTemplate,
+    isCurrent: Boolean,
+    accent: Color,
+    onClick: () -> Unit,
+) {
+    Column(
+        Modifier.width(112.dp).clickable(onClick = onClick),
+        verticalArrangement = Arrangement.spacedBy(7.dp),
+    ) {
+        // Drawn rather than rendered: a letterhead is a band and a rule, which
+        // is legible at this size where 10pt body copy would not be.
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .aspectRatio(595f / 842f)
+                .clip(RoundedCornerShape(10.dp))
+                .background(Color.White)
+                .border(
+                    width = if (isCurrent) 2.dp else 1.dp,
+                    color = if (isCurrent) accent else Theme.hairline(),
+                    shape = RoundedCornerShape(10.dp),
+                ),
+        ) {
+            LetterheadSketch(template, accent)
+        }
+        Text(
+            template.title,
+            fontSize = 11.sp,
+            fontWeight = if (isCurrent) FontWeight.SemiBold else FontWeight.Normal,
+            color = if (isCurrent) accent else Theme.ink(),
+            maxLines = 2,
+            lineHeight = 13.sp,
+        )
+    }
+}
+
+@Composable
+private fun LetterheadSketch(template: CoverLetterTemplate, accent: Color) {
+    val family = template.family()
+    Column(Modifier.fillMaxSize()) {
+        when (family) {
+            CoverLetterPdfRenderer.HeaderFamily.BAND ->
+                Box(Modifier.fillMaxWidth().height(22.dp).background(accent))
+            CoverLetterPdfRenderer.HeaderFamily.DARK ->
+                Box(Modifier.fillMaxWidth().height(26.dp).background(Color(0xFF14161A)))
+            CoverLetterPdfRenderer.HeaderFamily.SIDEBAR ->
+                Box(Modifier.fillMaxWidth()) {
+                    Box(Modifier.width(9.dp).height(120.dp).background(accent))
+                }
+            else -> Spacer(Modifier.height(14.dp))
+        }
+        Column(Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            if (family == CoverLetterPdfRenderer.HeaderFamily.CENTRED) {
+                Box(Modifier.fillMaxWidth(0.6f).height(4.dp).background(Theme.mutedInk().copy(alpha = 0.5f)))
+                Spacer(Modifier.height(2.dp))
+                Box(Modifier.fillMaxWidth().height(1.dp).background(accent))
+            } else if (family == CoverLetterPdfRenderer.HeaderFamily.RULE) {
+                Box(Modifier.fillMaxWidth(0.55f).height(4.dp).background(Theme.mutedInk().copy(alpha = 0.5f)))
+                Spacer(Modifier.height(2.dp))
+                Box(Modifier.fillMaxWidth().height(1.5.dp).background(accent))
+            }
+            Spacer(Modifier.height(3.dp))
+            repeat(7) { row ->
+                Box(
+                    Modifier
+                        .fillMaxWidth(if (row == 6) 0.5f else 0.92f)
+                        .height(2.dp)
+                        .background(Theme.mutedInk().copy(alpha = 0.28f)),
+                )
+            }
+        }
     }
 }
 

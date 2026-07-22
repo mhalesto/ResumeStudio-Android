@@ -3,6 +3,8 @@ package com.resumestudio.android.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -58,8 +61,9 @@ fun ApplicationsScreen(
 ) {
     var role by remember { mutableStateOf("") }
     var company by remember { mutableStateOf("") }
+    var filter by remember { mutableStateOf<JobApplicationStatus?>(null) }
 
-    val open = applications.count { it.status.isOpen }
+    val shown = applications.filter { filter == null || it.status == filter }
 
     LazyColumn(
         modifier = modifier.fillMaxSize().background(Theme.paper()),
@@ -68,18 +72,25 @@ fun ApplicationsScreen(
         ),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        item { CommandCentreHero(applications, accent) }
+
         item {
-            Column(Modifier.padding(bottom = 4.dp)) {
-                Text("Applications", style = displayStyle(30), color = Theme.ink())
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    if (applications.isEmpty()) {
-                        "Track an opportunity and it counts towards this week's campaign."
-                    } else {
-                        "$open open of ${applications.size} tracked."
-                    },
-                    fontSize = 13.sp, color = Theme.mutedInk(), lineHeight = 18.sp,
-                )
+            // The pipeline as filters, with counts. A stage showing zero is
+            // worth seeing — an empty Offers column is the whole reason someone
+            // opens this screen.
+            Row(
+                Modifier.horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(7.dp),
+            ) {
+                FilterChip("All", applications.size, filter == null, accent) { filter = null }
+                JobApplicationStatus.entries.forEach { status ->
+                    FilterChip(
+                        status.title,
+                        applications.count { it.status == status },
+                        filter == status,
+                        accent,
+                    ) { filter = if (filter == status) null else status }
+                }
             }
         }
 
@@ -113,9 +124,92 @@ fun ApplicationsScreen(
             }
         }
 
-        items(applications, key = { it.id }) { application ->
+        items(shown, key = { it.id }) { application ->
             ApplicationRow(application, accent, onSetStatus, onRemove)
         }
+    }
+}
+
+/**
+ * The command centre's opening, following `ApplicationCommandCenterView`.
+ *
+ * Three figures rather than a chart: at the volumes a job hunt actually runs
+ * at, a chart of five applications is decoration.
+ */
+@Composable
+private fun CommandCentreHero(applications: List<JobApplication>, accent: Color) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(Theme.heroRadius))
+            .background(Brush.verticalGradient(listOf(Theme.heroTop(), Theme.heroBottom())))
+            .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Text("APPLICATION COMMAND CENTER", style = EyebrowStyle, color = accent)
+        Text(
+            "Know what is moving\nand what needs you.",
+            style = displayStyle(27), color = Theme.heroInk, lineHeight = 32.sp,
+        )
+        Text(
+            "Every opportunity in one place, and what each is waiting on.",
+            fontSize = 12.5.sp, color = Theme.heroMutedInk, lineHeight = 17.sp,
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Metric("${applications.size}", "Tracked", Color(0xFF5B8DEF), Modifier.weight(1f))
+            Metric(
+                "${applications.count { it.status == JobApplicationStatus.INTERVIEW }}",
+                "Interview", accent, Modifier.weight(1f),
+            )
+            Metric(
+                "${applications.count { it.status == JobApplicationStatus.OFFER }}",
+                "Offers", Color(0xFF2AA84F), Modifier.weight(1f),
+            )
+        }
+    }
+}
+
+@Composable
+private fun Metric(value: String, label: String, tint: Color, modifier: Modifier = Modifier) {
+    Column(
+        modifier
+            .clip(RoundedCornerShape(Theme.tileRadius))
+            .background(Color.White.copy(alpha = 0.06f))
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+    ) {
+        Text(value, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = tint)
+        Text(label, fontSize = 10.5.sp, color = Theme.heroMutedInk)
+    }
+}
+
+@Composable
+private fun FilterChip(
+    label: String,
+    count: Int,
+    selected: Boolean,
+    accent: Color,
+    onClick: () -> Unit,
+) {
+    Row(
+        Modifier
+            .clip(RoundedCornerShape(10.dp))
+            .background(if (selected) accent else Theme.card())
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            label,
+            fontSize = 11.5.sp,
+            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+            color = if (selected) Color.White else Theme.inkSoft(),
+        )
+        Spacer(Modifier.size(5.dp))
+        Text(
+            "$count",
+            fontSize = 11.sp,
+            color = if (selected) Color.White.copy(alpha = 0.75f) else Theme.mutedInk(),
+        )
     }
 }
 

@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -56,7 +57,12 @@ import kotlinx.coroutines.withContext
 fun GalleryScreen(
     document: ResumeDocument,
     accent: Color,
+    resumeCount: Int,
     onOpenTemplate: (ResumeTemplate) -> Unit,
+    onOpenLibrary: () -> Unit,
+    onOpenCoverLetter: () -> Unit,
+    onPreview: () -> Unit,
+    onShare: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val templates = remember { ResumeTemplate.entries.sortedBy { it.wireName } }
@@ -76,19 +82,115 @@ fun GalleryScreen(
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         item {
-            Column(Modifier.padding(bottom = 6.dp)) {
-                Text("Templates", style = displayStyle(30), color = Theme.ink())
+            Column(Modifier.padding(bottom = 2.dp)) {
+                Text("Documents", style = displayStyle(30), color = Theme.ink())
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    "${TemplateCatalogue.twoColumnTemplates().size} of ${templates.size} lay the page " +
-                        "out in two columns. Tap one to render it.",
+                    "Everything you send, and the looks it can wear.",
                     fontSize = 13.sp, color = Theme.mutedInk(), lineHeight = 18.sp,
+                )
+            }
+        }
+
+        // What the user actually has, before what they could choose. The tab is
+        // called Documents, so the documents come first and the catalogue is the
+        // thing they are dressed in.
+        item {
+            DocumentRow(
+                title = document.personal.fullName.ifBlank { "Untitled résumé" },
+                detail = "$resumeCount version${if (resumeCount == 1) "" else "s"} · " +
+                    document.template.wireName.replaceFirstChar { it.uppercase() } +
+                    " · ${document.completionPercentage}% complete",
+                initials = document.initials.ifBlank { "?" },
+                accent = accent,
+                onClick = onOpenLibrary,
+            )
+        }
+
+        item {
+            DocumentRow(
+                title = "Cover letter",
+                detail = "Drafted to match your résumé",
+                initials = "CL",
+                accent = accent,
+                onClick = onOpenCoverLetter,
+            )
+        }
+
+        item {
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+                DocumentAction("Preview", accent, filled = true, modifier = Modifier.weight(1f), onClick = onPreview)
+                DocumentAction("Share PDF", accent, filled = false, modifier = Modifier.weight(1f), onClick = onShare)
+            }
+        }
+
+        item {
+            Column(Modifier.padding(top = 10.dp, bottom = 2.dp)) {
+                SectionHeading(
+                    "Templates",
+                    "${TemplateCatalogue.twoColumnTemplates().size} of ${templates.size} lay the page " +
+                        "out in two columns.",
                 )
             }
         }
         items(templates, key = { it.wireName }) { template ->
             TemplateCard(template, document, thumbnails, accent) { onOpenTemplate(template) }
         }
+    }
+}
+
+@Composable
+private fun DocumentRow(
+    title: String,
+    detail: String,
+    initials: String,
+    accent: Color,
+    onClick: () -> Unit,
+) {
+    Row(
+        Modifier.fillMaxWidth().cardSurface().clickable(onClick = onClick).padding(14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Box(
+            Modifier.size(38.dp).clip(androidx.compose.foundation.shape.CircleShape).background(accent),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(initials, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+        }
+        Column(Modifier.weight(1f)) {
+            Text(title, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Theme.ink())
+            Text(detail, fontSize = 11.sp, color = Theme.mutedInk())
+        }
+        Icon(
+            Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            null, tint = Theme.mutedInk(), modifier = Modifier.size(18.dp),
+        )
+    }
+}
+
+@Composable
+private fun DocumentAction(
+    label: String,
+    accent: Color,
+    filled: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier
+            .clip(RoundedCornerShape(13.dp))
+            .background(if (filled) accent else Theme.card())
+            .then(if (filled) Modifier else Modifier.border(1.dp, Theme.hairline(), RoundedCornerShape(13.dp)))
+            .clickable(onClick = onClick)
+            .padding(vertical = 12.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            label,
+            color = if (filled) Color.White else Theme.ink(),
+            fontWeight = FontWeight.SemiBold, fontSize = 14.sp,
+        )
     }
 }
 

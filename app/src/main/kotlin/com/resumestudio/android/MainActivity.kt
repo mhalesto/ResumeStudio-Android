@@ -61,6 +61,7 @@ import com.resumestudio.android.ui.ResumeLibraryScreen
 import com.resumestudio.android.ui.CoverLetterScreen
 import com.resumestudio.android.ui.FloatingCareerCoach
 import com.resumestudio.android.ui.SettingsScreen
+import com.resumestudio.android.ui.SplashScreen
 import com.resumestudio.android.ui.GalleryScreen
 import com.resumestudio.android.ui.HomeScreen
 import com.resumestudio.android.ui.LocalAccent
@@ -70,6 +71,7 @@ import com.resumestudio.android.ui.TemplatePreviewScreen
 import com.resumestudio.android.ui.Theme
 import com.resumestudio.android.ui.cardSurface
 import com.resumestudio.android.ui.displayStyle
+import com.resumestudio.render.TemplateThumbnailCache
 import com.resumestudio.model.ResumeAccent
 import com.resumestudio.model.TodayActions
 import com.resumestudio.model.TodayRoute
@@ -79,7 +81,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent { AppShell() }
+        setContent {
+            // Shown once per process, not per composition: a splash that
+            // reappears when the activity is recreated reads as a crash.
+            var splashDone by rememberSaveable { mutableStateOf(false) }
+            if (splashDone) {
+                AppShell()
+            } else {
+                ResumeStudioTheme { SplashScreen(onFinish = { splashDone = true }) }
+            }
+        }
     }
 }
 
@@ -106,6 +117,13 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
     val accent = document.accent
     val momentum = remember(applications) { viewModel.momentum() }
     val todayActions = remember(document, momentum) { TodayActions.build(document, momentum) }
+    val cacheDir = LocalContext.current.cacheDir
+    val thumbnails = remember(cacheDir) {
+        TemplateThumbnailCache(
+            directory = java.io.File(cacheDir, "thumbnails"),
+            rasterizer = com.resumestudio.render.ResumePageRasterizer(cacheDir),
+        )
+    }
 
     var tab by rememberSaveable { mutableStateOf(AppTab.HOME.name) }
     var previewing by rememberSaveable { mutableStateOf<String?>(null) }
@@ -233,6 +251,8 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
                         applicationCount = applications.size,
                         todayActions = todayActions,
                         momentum = momentum,
+                        coverLetter = coverLetter,
+                        thumbnails = thumbnails,
                         onOpenGallery = { tab = AppTab.DOCUMENTS.name },
                         onOpenApplications = { tab = AppTab.APPLICATIONS.name },
                         onOpenCoverLetter = { writingLetter = true },
@@ -258,7 +278,12 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
                     AppTab.DOCUMENTS -> GalleryScreen(
                         document = document,
                         accent = accentColor,
+                        resumeCount = library.resumes.size,
                         onOpenTemplate = { previewing = it.wireName },
+                        onOpenLibrary = { browsingLibrary = true },
+                        onOpenCoverLetter = { writingLetter = true },
+                        onPreview = { previewing = document.template.wireName },
+                        onShare = { ResumeExporter.share(context, document) },
                     )
 
                     AppTab.APPLICATIONS -> ApplicationsScreen(
