@@ -81,6 +81,63 @@ class ResumeStore(private val file: File) {
         save()
     }
 
+    /**
+     * Copies the active résumé, mirroring `duplicateActiveResume`.
+     *
+     * Tailoring a résumé to one job without losing the general one is the whole
+     * reason the library exists, so the copy becomes active immediately — the
+     * next edit belongs to the copy, not the original.
+     */
+    fun duplicateActive(): String {
+        val current = _state.value
+        val base = current.active?.title ?: defaultDraftTitle(document)
+        val copy = ResumeDraft(title = "$base Copy", document = document)
+        _state.value = current.copy(
+            resumes = current.resumes + copy,
+            activeResumeID = copy.id,
+        )
+        save()
+        return copy.id
+    }
+
+    fun rename(id: String, title: String) {
+        _state.value = _state.value.copy(
+            resumes = _state.value.resumes.map {
+                if (it.id == id) {
+                    it.copy(title = title.trim().ifBlank { "Untitled Résumé" }, updatedAt = nowSeconds())
+                } else {
+                    it
+                }
+            },
+        )
+        save()
+    }
+
+    /**
+     * Deletes a résumé, unless it is the only one.
+     *
+     * iOS guards on `resumes.count > 1` for the same reason: an empty library
+     * has no active document, and the screens behind it all assume one exists.
+     * Refusing is better than silently creating a blank replacement.
+     */
+    fun delete(id: String) {
+        val current = _state.value
+        if (current.resumes.size <= 1) return
+        val index = current.resumes.indexOfFirst { it.id == id }
+        if (index < 0) return
+
+        val remaining = current.resumes.filterNot { it.id == id }
+        _state.value = current.copy(
+            resumes = remaining,
+            activeResumeID = if (current.activeResumeID == id) {
+                remaining[index.coerceAtMost(remaining.lastIndex)].id
+            } else {
+                current.activeResumeID
+            },
+        )
+        save()
+    }
+
     fun select(id: String) {
         if (_state.value.resumes.any { it.id == id }) {
             _state.value = _state.value.copy(activeResumeID = id)

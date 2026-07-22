@@ -64,6 +64,7 @@ fun HomeScreen(
     onOpenGallery: () -> Unit,
     onOpenApplications: () -> Unit,
     onOpenCoverLetter: () -> Unit,
+    onOpenLibrary: () -> Unit,
     onTodayAction: (TodayAction) -> Unit,
     onPreview: () -> Unit,
     onShare: () -> Unit,
@@ -87,7 +88,7 @@ fun HomeScreen(
         item {
             CareerWorkspace(
                 accent, resumeCount, applicationCount,
-                onOpenGallery, onOpenApplications, onOpenCoverLetter,
+                onOpenGallery, onOpenApplications, onOpenCoverLetter, onOpenLibrary,
             )
         }
         item { Templates(accent, onOpenGallery, onOpenTemplate) }
@@ -257,6 +258,7 @@ private fun CareerWorkspace(
     onOpenGallery: () -> Unit,
     onOpenApplications: () -> Unit,
     onOpenCoverLetter: () -> Unit,
+    onOpenLibrary: () -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         SectionHeading("Career workspace", "Keep every résumé version and application connected.")
@@ -264,7 +266,7 @@ private fun CareerWorkspace(
             ArtworkCard(
                 "My résumés",
                 "$resumeCount version${if (resumeCount == 1) "" else "s"}",
-                R.drawable.workspace_resumes, accent, Modifier.weight(1f), onOpenGallery,
+                R.drawable.workspace_resumes, accent, Modifier.weight(1f), onOpenLibrary,
             )
             ArtworkCard(
                 "Applications",

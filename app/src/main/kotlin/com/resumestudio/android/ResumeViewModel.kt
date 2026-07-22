@@ -62,6 +62,16 @@ class ResumeViewModel(application: Application) : AndroidViewModel(application) 
 
     fun edit(transform: (ResumeDocument) -> ResumeDocument) = store.edit(transform)
 
+    // --- library ----------------------------------------------------------
+
+    fun selectResume(id: String) = store.select(id)
+
+    fun duplicateResume() { store.duplicateActive() }
+
+    fun renameResume(id: String, title: String) = store.rename(id, title)
+
+    fun deleteResume(id: String) = store.delete(id)
+
     fun setAccent(accent: ResumeAccent) = edit { it.copy(accent = accent) }
 
     fun setTemplate(template: ResumeTemplate) = edit { it.copy(template = template) }

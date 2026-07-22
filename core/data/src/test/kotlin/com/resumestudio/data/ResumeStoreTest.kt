@@ -9,6 +9,7 @@ import com.resumestudio.model.blank
 import com.resumestudio.model.example
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -165,5 +166,82 @@ class ResumeStoreFirstRunTest {
         // And the identity it wrote is the identity it reopens with, so anything
         // that later syncs these drafts sees stable IDs.
         assertEquals(store.state.value.activeResumeID, ResumeStore(file).state.value.activeResumeID)
+    }
+}
+
+/** The library operations, whose failure modes are all about losing work. */
+class ResumeLibraryTest {
+
+    @get:Rule val folder = TemporaryFolder()
+
+    private fun store() = ResumeStore(File(folder.newFolder(), "draft.json"))
+
+    @Test
+    fun `duplicating copies the document and makes the copy active`() {
+        val store = store()
+        val original = store.state.value.activeResumeID
+        store.duplicateActive()
+
+        assertEquals(2, store.state.value.resumes.size)
+        assertNotEquals(original, store.state.value.activeResumeID)
+        // The copy carries the content — tailoring starts from the work already done.
+        assertEquals("Avery Sample", store.document.personal.fullName)
+        assertTrue(store.state.value.active!!.title.endsWith("Copy"))
+    }
+
+    @Test
+    fun `editing after duplicating leaves the original untouched`() {
+        val store = store()
+        val originalID = store.state.value.activeResumeID
+        store.duplicateActive()
+        store.edit { it.copy(personal = it.personal.copy(fullName = "Tailored Version")) }
+
+        val original = store.state.value.resumes.first { it.id == originalID }
+        assertEquals("Avery Sample", original.document.personal.fullName)
+        assertEquals("Tailored Version", store.document.personal.fullName)
+    }
+
+    @Test
+    fun `the last resume cannot be deleted`() {
+        val store = store()
+        store.delete(store.state.value.activeResumeID)
+
+        // Every screen behind the library assumes an active document exists.
+        assertEquals(1, store.state.value.resumes.size)
+    }
+
+    @Test
+    fun `deleting the active resume selects a neighbour`() {
+        val store = store()
+        store.duplicateActive()
+        val active = store.state.value.activeResumeID
+
+        store.delete(active)
+
+        assertEquals(1, store.state.value.resumes.size)
+        assertNotEquals(active, store.state.value.activeResumeID)
+        assertNotNull(store.state.value.active)
+    }
+
+    @Test
+    fun `renaming falls back rather than leaving a blank title`() {
+        val store = store()
+        val id = store.state.value.activeResumeID
+        store.rename(id, "   ")
+        assertEquals("Untitled Résumé", store.state.value.active?.title)
+    }
+
+    @Test
+    fun `the library survives a reopen with its selection intact`() {
+        val file = File(folder.newFolder(), "draft.json")
+        val store = ResumeStore(file)
+        store.duplicateActive()
+        store.rename(store.state.value.activeResumeID, "Tailored for Acme")
+        val activeID = store.state.value.activeResumeID
+
+        val reopened = ResumeStore(file)
+        assertEquals(2, reopened.state.value.resumes.size)
+        assertEquals(activeID, reopened.state.value.activeResumeID)
+        assertEquals("Tailored for Acme", reopened.state.value.active?.title)
     }
 }

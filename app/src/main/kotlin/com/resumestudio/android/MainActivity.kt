@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.resumestudio.android.ui.EditorScreen
 import com.resumestudio.android.ui.ApplicationsScreen
+import com.resumestudio.android.ui.ResumeLibraryScreen
 import com.resumestudio.android.ui.CoverLetterScreen
 import com.resumestudio.android.ui.FloatingCareerCoach
 import com.resumestudio.android.ui.SettingsScreen
@@ -105,6 +106,7 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
     var editing by rememberSaveable { mutableStateOf(false) }
     var coaching by rememberSaveable { mutableStateOf(false) }
     var writingLetter by rememberSaveable { mutableStateOf(false) }
+    var browsingLibrary by rememberSaveable { mutableStateOf(false) }
 
     ResumeStudioTheme(accent = accent) {
         val accentColor = LocalAccent.current
@@ -123,6 +125,22 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
                     previewing = null
                 },
                 onShare = { ResumeExporter.share(context, document.copy(template = template)) },
+                modifier = Modifier.fillMaxSize(),
+            )
+            return@ResumeStudioTheme
+        }
+
+        if (browsingLibrary) {
+            BackHandler { browsingLibrary = false }
+            ResumeLibraryScreen(
+                resumes = library.resumes,
+                activeID = library.activeResumeID,
+                accent = accentColor,
+                onSelect = viewModel::selectResume,
+                onDuplicate = viewModel::duplicateResume,
+                onRename = viewModel::renameResume,
+                onDelete = viewModel::deleteResume,
+                onBack = { browsingLibrary = false },
                 modifier = Modifier.fillMaxSize(),
             )
             return@ResumeStudioTheme
@@ -171,6 +189,7 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
                         onOpenGallery = { tab = AppTab.DOCUMENTS.name },
                         onOpenApplications = { tab = AppTab.APPLICATIONS.name },
                         onOpenCoverLetter = { writingLetter = true },
+                        onOpenLibrary = { browsingLibrary = true },
                         onTodayAction = { action ->
                             when (action.route) {
                                 TodayRoute.EDITOR, TodayRoute.CLAIMS -> editing = true
