@@ -40,6 +40,20 @@ data class ResumeDocument(
             .take(2)
             .joinToString("") { it.first().uppercase() }
 
+    /**
+     * The name an exported file takes, mirroring `suggestedFilename`.
+     *
+     * The character set stripped here is the one Windows and the web object to,
+     * not just the one Android does — an exported résumé is mostly going to end
+     * up as an email attachment on somebody else's machine.
+     */
+    val suggestedFilename: String
+        get() {
+            val source = personal.fullName.trim()
+            val base = if (source.isEmpty()) "Resume" else "$source Resume"
+            return base.split(*"""/\:?%*|"<>""".toCharArray()).joinToString("-")
+        }
+
     /** How much of the résumé has content, 0–1. The nine checks iOS makes. */
     val completion: Double
         get() {

@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MailOutline
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.WorkOutline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -35,6 +36,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.resumestudio.android.R
 import com.resumestudio.model.ResumeDocument
 import com.resumestudio.model.ResumeTemplate
 import com.resumestudio.model.TemplateCatalogue
@@ -55,7 +57,9 @@ fun HomeScreen(
     accent: Color,
     resumeCount: Int,
     onOpenGallery: () -> Unit,
+    onOpenCoach: () -> Unit,
     onPreview: () -> Unit,
+    onShare: () -> Unit,
     onEdit: () -> Unit,
     onOpenTemplate: (ResumeTemplate) -> Unit,
     onLoadExample: () -> Unit,
@@ -69,9 +73,11 @@ fun HomeScreen(
         ),
         verticalArrangement = Arrangement.spacedBy(Theme.sectionSpacing),
     ) {
-        item { Hero(document, accent, onPreview, onOpenGallery) }
+        item { Hero(document, accent, onPreview, onShare, onOpenGallery) }
+        item { CareerCoachCard(accent, onOpenCoach) }
         item { StartCreating(accent, onLoadExample, onStartBlank) }
-        item { CareerWorkspace(accent, resumeCount) }
+        item { CareerCampaign(accent) }
+        item { CareerWorkspace(accent, resumeCount, onOpenGallery) }
         item { Templates(accent, onOpenGallery, onOpenTemplate) }
         item { RecentlyEdited(document, accent, onEdit) }
         item { PrivacyNote() }
@@ -85,6 +91,7 @@ private fun Hero(
     document: ResumeDocument,
     accent: Color,
     onPreview: () -> Unit,
+    onShare: () -> Unit,
     onOpenGallery: () -> Unit,
 ) {
     val greeting = document.personal.fullName
@@ -118,19 +125,35 @@ private fun Hero(
 
         // The PDF is the point of the app, so the action that produces one is
         // the only filled button on the screen.
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(14.dp))
-                .background(accent)
-                .clickable(onClick = onPreview)
-                .padding(vertical = 13.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text("Preview résumé", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
-            Spacer(Modifier.size(8.dp))
-            Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = Color.White, modifier = Modifier.size(17.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(
+                Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(accent)
+                    .clickable(onClick = onPreview)
+                    .padding(vertical = 13.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("Preview", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                Spacer(Modifier.size(8.dp))
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = Color.White, modifier = Modifier.size(17.dp))
+            }
+            Row(
+                Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(Color.White.copy(alpha = 0.08f))
+                    .clickable(onClick = onShare)
+                    .padding(vertical = 13.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(Icons.Filled.Share, null, tint = Theme.heroInk, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.size(8.dp))
+                Text("Share PDF", color = Theme.heroInk, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+            }
         }
 
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -215,21 +238,56 @@ private fun QuickStartCard(
 // --- workspace --------------------------------------------------------------
 
 @Composable
-private fun CareerWorkspace(accent: Color, resumeCount: Int) {
+private fun CareerWorkspace(accent: Color, resumeCount: Int, onOpenGallery: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         SectionHeading("Career workspace", "Keep every résumé version and application connected.")
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            WorkspaceCard(
+            ArtworkCard(
                 "My résumés",
                 "$resumeCount version${if (resumeCount == 1) "" else "s"}",
-                Icons.Filled.Description, accent, Modifier.weight(1f),
+                R.drawable.workspace_resumes, accent, Modifier.weight(1f), onOpenGallery,
             )
-            WorkspaceCard("Applications", "0 tracked", Icons.Filled.WorkOutline, accent, Modifier.weight(1f))
+            ArtworkCard(
+                "Applications", "0 tracked",
+                R.drawable.workspace_applications, accent, Modifier.weight(1f),
+            )
         }
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            WorkspaceCard("Cover letters", "Draft to match", Icons.Filled.MailOutline, accent, Modifier.weight(1f))
-            WorkspaceCard("Interview prep", "Nothing upcoming", Icons.Filled.GridView, accent, Modifier.weight(1f))
+            ArtworkCard(
+                "Interview prep", "Nothing upcoming",
+                R.drawable.workspace_interview, accent, Modifier.weight(1f),
+            )
+            ArtworkCard(
+                "ATS check", "Score a draft",
+                R.drawable.workspace_ats, accent, Modifier.weight(1f),
+            )
         }
+        SmartLinksCard(accent, linkCount = 0, viewCount = 0, onClick = {})
+    }
+}
+
+/**
+ * The weekly campaign, following HomeView's `campaign` section.
+ *
+ * The goals are the iOS defaults; the counts are zero because the stores that
+ * would fill them are not ported. Stated plainly on the card rather than
+ * padded out with plausible-looking numbers.
+ */
+@Composable
+private fun CareerCampaign(accent: Color) {
+    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        SectionHeading("This week", "Momentum comes from a rhythm, not a burst.")
+        MomentumCard(
+            accent = accent,
+            opportunities = 0 to 5,
+            relationships = 0 to 3,
+            practice = 0 to 2,
+        )
+        HeroBanner(
+            title = "Career intelligence",
+            subtitle = "Benchmarks, market signals and what they mean for your next move.",
+            artwork = R.drawable.career_intelligence_hero,
+        )
     }
 }
 
@@ -300,7 +358,9 @@ private fun TemplateStrip(template: ResumeTemplate, accent: Color, onClick: () -
             Modifier
                 .size(width = 30.dp, height = 42.dp)
                 .clip(RoundedCornerShape(4.dp))
-                .background(if (plan.darkPaper) Color(0xFF14161A) else Theme.muted()),
+                // Paper is white whatever the app's theme is doing — same rule
+                // as the gallery thumbnail; only dark-paper templates are dark.
+                .background(if (plan.darkPaper) Color(0xFF14161A) else Color.White),
         ) {
             (plan.body as? com.resumestudio.model.BodyLayout.Side)?.let { side ->
                 Box(

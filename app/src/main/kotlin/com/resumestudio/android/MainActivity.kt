@@ -42,6 +42,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -91,9 +92,11 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
     var tab by rememberSaveable { mutableStateOf(AppTab.HOME.name) }
     var previewing by rememberSaveable { mutableStateOf<String?>(null) }
     var editing by rememberSaveable { mutableStateOf(false) }
+    var coaching by rememberSaveable { mutableStateOf(false) }
 
     ResumeStudioTheme(accent = accent) {
         val accentColor = LocalAccent.current
+        val context = LocalContext.current
         val template = previewing?.let(ResumeTemplate::from)
 
         if (template != null) {
@@ -103,6 +106,11 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
                 document = document,
                 accent = accentColor,
                 onBack = { previewing = null },
+                onApply = {
+                    viewModel.setTemplate(template)
+                    previewing = null
+                },
+                onShare = { ResumeExporter.share(context, document.copy(template = template)) },
                 modifier = Modifier.fillMaxSize(),
             )
             return@ResumeStudioTheme
@@ -132,7 +140,9 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
                         accent = accentColor,
                         resumeCount = library.resumes.size,
                         onOpenGallery = { tab = AppTab.DOCUMENTS.name },
+                        onOpenCoach = { coaching = true },
                         onPreview = { previewing = document.template.wireName },
+                        onShare = { ResumeExporter.share(context, document) },
                         onEdit = { editing = true },
                         onOpenTemplate = { previewing = it.wireName },
                         onLoadExample = viewModel::loadExample,

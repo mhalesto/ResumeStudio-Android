@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Only the export directory is shared. Nothing else in the cache, and
+         nothing in files/ — draft.json is the whole library and must not be
+         reachable through a content URI. -->
+    <cache-path name="exports" path="exports/" />
+</paths>

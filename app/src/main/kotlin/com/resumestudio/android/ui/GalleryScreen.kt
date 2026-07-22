@@ -3,6 +3,7 @@ package com.resumestudio.android.ui
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -107,12 +108,13 @@ private fun PageThumb(plan: TemplatePlan, accent: Color) {
         Modifier
             .size(width = 34.dp, height = 48.dp)
             .clip(RoundedCornerShape(4.dp))
+            // Paper is white whatever the app's theme is doing — the thumbnail
+            // stands for the printed page, not for the surface it sits on. Only
+            // the dark-paper templates are dark. The second background this used
+            // to stack painted straight over the first, which is why every page
+            // came out grey.
             .background(if (plan.darkPaper) Color(0xFF14161A) else Color.White)
-            .then(
-                Modifier.background(
-                    if (plan.darkPaper) Color(0xFF14161A) else Theme.muted().copy(alpha = 0.5f),
-                ),
-            ),
+            .border(1.dp, Theme.hairline(), RoundedCornerShape(4.dp)),
     ) {
         (plan.body as? BodyLayout.Side)?.let { side ->
             Box(
@@ -142,8 +144,11 @@ fun TemplatePreviewScreen(
     document: ResumeDocument,
     accent: Color,
     onBack: () -> Unit,
+    onApply: () -> Unit,
+    onShare: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val isCurrent = document.template == template
     val cacheDir = LocalContext.current.cacheDir
 
     val page by produceState<ResumePageRasterizer.Page?>(null, template, document) {
@@ -187,7 +192,78 @@ fun TemplatePreviewScreen(
         )
 
         PagePreview(page?.bitmap, accent)
+        Spacer(Modifier.height(14.dp))
+
+        // Choosing the template is the point of standing on this screen, so it
+        // is the filled action; sharing is available but secondary until one is
+        // chosen. Nothing here is enabled while the page is still rendering —
+        // sharing a half-written PDF is worse than waiting for it.
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+            PrimaryAction(
+                label = if (isCurrent) "Current template" else "Use this template",
+                enabled = !isCurrent,
+                accent = accent,
+                modifier = Modifier.weight(1f),
+                onClick = onApply,
+            )
+            SecondaryAction(
+                label = "Share PDF",
+                enabled = page != null,
+                modifier = Modifier.weight(1f),
+                onClick = onShare,
+            )
+        }
         Spacer(Modifier.height(24.dp))
+    }
+}
+
+@Composable
+private fun PrimaryAction(
+    label: String,
+    enabled: Boolean,
+    accent: Color,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier
+            .clip(RoundedCornerShape(13.dp))
+            .background(if (enabled) accent else Theme.muted())
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(vertical = 13.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            label,
+            color = if (enabled) Color.White else Theme.mutedInk(),
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 14.sp,
+        )
+    }
+}
+
+@Composable
+private fun SecondaryAction(
+    label: String,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier
+            .clip(RoundedCornerShape(13.dp))
+            .background(Theme.card())
+            .border(1.dp, Theme.hairline(), RoundedCornerShape(13.dp))
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(vertical = 13.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            label,
+            color = if (enabled) Theme.ink() else Theme.mutedInk(),
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 14.sp,
+        )
     }
 }
 
