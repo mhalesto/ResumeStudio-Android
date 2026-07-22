@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.resumestudio.android.R
+import com.resumestudio.model.CareerMomentumSnapshot
 import com.resumestudio.model.ResumeDocument
 import com.resumestudio.model.ResumeTemplate
 import com.resumestudio.model.TemplateCatalogue
@@ -57,7 +58,6 @@ fun HomeScreen(
     accent: Color,
     resumeCount: Int,
     onOpenGallery: () -> Unit,
-    onOpenCoach: () -> Unit,
     onPreview: () -> Unit,
     onShare: () -> Unit,
     onEdit: () -> Unit,
@@ -69,12 +69,11 @@ fun HomeScreen(
     LazyColumn(
         modifier = modifier.fillMaxWidth().background(Theme.paper()),
         contentPadding = androidx.compose.foundation.layout.PaddingValues(
-            start = 20.dp, end = 20.dp, top = 12.dp, bottom = 40.dp,
+            start = 20.dp, end = 20.dp, top = 12.dp, bottom = Theme.footerScrollClearance,
         ),
         verticalArrangement = Arrangement.spacedBy(Theme.sectionSpacing),
     ) {
         item { Hero(document, accent, onPreview, onShare, onOpenGallery) }
-        item { CareerCoachCard(accent, onOpenCoach) }
         item { StartCreating(accent, onLoadExample, onStartBlank) }
         item { CareerCampaign(accent) }
         item { CareerWorkspace(accent, resumeCount, onOpenGallery) }
@@ -278,10 +277,9 @@ private fun CareerCampaign(accent: Color) {
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         SectionHeading("This week", "Momentum comes from a rhythm, not a burst.")
         MomentumCard(
+            snapshot = CareerMomentumSnapshot.empty(),
             accent = accent,
-            opportunities = 0 to 5,
-            relationships = 0 to 3,
-            practice = 0 to 2,
+            onClick = {},
         )
         HeroBanner(
             title = "Career intelligence",

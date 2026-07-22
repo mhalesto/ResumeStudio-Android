@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.resumestudio.android.ui.EditorScreen
+import com.resumestudio.android.ui.FloatingCareerCoach
 import com.resumestudio.android.ui.GalleryScreen
 import com.resumestudio.android.ui.HomeScreen
 import com.resumestudio.android.ui.LocalAccent
@@ -86,6 +87,7 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
     // tints the UI and sets the ink in the export; a separate UI accent here
     // would let the two drift and make the Settings caption a lie.
     val library by viewModel.state.collectAsState()
+    val coachIntroDismissed by viewModel.coachIntroDismissed.collectAsState()
     val document = library.document
     val accent = document.accent
 
@@ -140,7 +142,6 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
                         accent = accentColor,
                         resumeCount = library.resumes.size,
                         onOpenGallery = { tab = AppTab.DOCUMENTS.name },
-                        onOpenCoach = { coaching = true },
                         onPreview = { previewing = document.template.wireName },
                         onShare = { ResumeExporter.share(context, document) },
                         onEdit = { editing = true },
@@ -162,6 +163,18 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
 
                     AppTab.SETTINGS -> SettingsScreen(accent, viewModel::setAccent)
                 }
+
+                // Over the content, not in it: an assistant that is available
+                // rather than a menu item that has to be found.
+                FloatingCareerCoach(
+                    accent = accentColor,
+                    showIntro = !coachIntroDismissed,
+                    onDismissIntro = viewModel::dismissCoachIntro,
+                    onOpen = { coaching = true },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 18.dp, bottom = 18.dp),
+                )
             }
         }
     }

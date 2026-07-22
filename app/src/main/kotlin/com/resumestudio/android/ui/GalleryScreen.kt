@@ -61,7 +61,9 @@ fun GalleryScreen(
 
     LazyColumn(
         modifier = modifier.fillMaxSize().background(Theme.paper()),
-        contentPadding = PaddingValues(20.dp),
+        contentPadding = PaddingValues(
+            start = 20.dp, end = 20.dp, top = 20.dp, bottom = Theme.footerScrollClearance,
+        ),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         item {

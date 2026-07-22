@@ -74,6 +74,15 @@ object Theme {
     val tileRadius = 16.dp
 
     val screenPadding = PaddingValues(horizontal = 20.dp)
+
+    /**
+     * Space after the final row in every tab-owned scroll view.
+     *
+     * The floating coach is 68dp plus its 18dp inset; the remainder keeps the
+     * last card visibly clear of it at the end of a scroll rather than tucked
+     * underneath. iOS carries the same constant for the same reason.
+     */
+    val footerScrollClearance = 104.dp
     val sectionSpacing = 30.dp
 
     /** Resolves per appearance, so tokens work in light and dark. */

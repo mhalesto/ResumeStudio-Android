@@ -16,13 +16,23 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Bolt
+import androidx.compose.material.icons.filled.GpsFixed
+import androidx.compose.material.icons.filled.GraphicEq
+import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.offset
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -32,6 +42,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.resumestudio.android.R
+import com.resumestudio.model.CareerMomentumMission
+import com.resumestudio.model.CareerMomentumPillar
+import com.resumestudio.model.CareerMomentumSnapshot
 
 /**
  * A workspace tile with the app's own artwork behind it.
@@ -112,72 +125,161 @@ fun CareerCoachCard(accent: Color, onClick: () -> Unit, modifier: Modifier = Mod
 }
 
 /**
- * The three pillars of the weekly campaign, following `CareerMomentumPillar`.
+ * The week's scoreboard, following HomeView's `campaign` section.
  *
- * Reads zero because Android has no application, contact or practice store yet.
- * That is stated rather than dressed up — a card showing invented progress is
- * worse than one admitting there is nothing to show, because the whole point of
- * the pillar is that the number is real.
+ * Three bars on a plain card read as a form; a tinted panel with the bolt
+ * rising out of the corner reads as progress, which is what the numbers are
+ * actually about. That comment is iOS's and it is the reason this card has a
+ * backdrop rather than a border.
+ *
+ * The score is progress against goals the user set, not a rating of them.
  */
 @Composable
 fun MomentumCard(
+    snapshot: CareerMomentumSnapshot,
     accent: Color,
-    opportunities: Pair<Int, Int>,
-    relationships: Pair<Int, Int>,
-    practice: Pair<Int, Int>,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val pillars = listOf(
-        Triple("Opportunities", opportunities, "captured this week"),
-        Triple("Relationships", relationships, "people contacted"),
-        Triple("Practice", practice, "sessions run"),
-    )
-    val total = pillars.sumOf { it.second.first }
-
-    Column(
-        modifier.fillMaxWidth().cardSurface().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+    Box(
+        modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(Theme.card())
+            .border(1.dp, Theme.hairline(), RoundedCornerShape(20.dp))
+            .clickable(onClick = onClick),
     ) {
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-            Column {
-                Text("Career momentum", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Theme.ink())
+        // The backdrop: accent falling away down the panel, with the mark the
+        // score is about lifted out of the bottom-right corner.
+        Box(
+            Modifier
+                .matchParentSize()
+                .background(
+                    Brush.verticalGradient(
+                        0f to accent.copy(alpha = 0.16f),
+                        0.5f to accent.copy(alpha = 0.05f),
+                        1f to Color.Transparent,
+                    ),
+                ),
+        )
+        Icon(
+            if (snapshot.isComplete) Icons.Filled.Verified else Icons.Filled.Bolt,
+            contentDescription = null,
+            tint = accent.copy(alpha = 0.07f),
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .size(132.dp)
+                .offset(x = 34.dp, y = 26.dp)
+                .rotate(-8f),
+        )
+
+        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Filled.Bolt, null, tint = accent, modifier = Modifier.size(14.dp))
+                Spacer(Modifier.size(5.dp))
+                Text("CAREER MOMENTUM", style = EyebrowStyle, color = accent)
+                Spacer(Modifier.weight(1f))
+                Row(verticalAlignment = Alignment.Bottom) {
+                    Text(
+                        "${snapshot.score}",
+                        fontSize = 21.sp, fontWeight = FontWeight.Bold, color = Theme.ink(),
+                    )
+                    Text(
+                        "/100",
+                        fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Theme.mutedInk(),
+                        modifier = Modifier.padding(bottom = 2.dp),
+                    )
+                }
+            }
+
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    if (total == 0) "Nothing logged this week yet."
-                    else "$total of ${pillars.sumOf { it.second.second }} this week.",
-                    fontSize = 11.sp, color = Theme.mutedInk(),
+                    snapshot.tier.title,
+                    fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Theme.ink(),
+                )
+                Spacer(Modifier.weight(1f))
+                if (snapshot.rhythmWeeks > 0) {
+                    Icon(Icons.Filled.LocalFireDepartment, null, tint = accent, modifier = Modifier.size(13.dp))
+                    Spacer(Modifier.size(3.dp))
+                    Text(
+                        "${snapshot.rhythmWeeks}-week rhythm",
+                        fontSize = 11.sp, fontWeight = FontWeight.Bold, color = accent,
+                    )
+                    Spacer(Modifier.size(6.dp))
+                }
+                Icon(
+                    Icons.AutoMirrored.Filled.KeyboardArrowRight, null,
+                    tint = Theme.mutedInk(), modifier = Modifier.size(18.dp),
                 )
             }
-            Box(
-                Modifier.size(38.dp).clip(CircleShape).background(accent.copy(alpha = 0.14f)),
-                contentAlignment = Alignment.Center,
-            ) {
-                Text("$total", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = accent)
-            }
-        }
 
-        pillars.forEach { (title, progress, unit) ->
-            val (done, goal) = progress
-            Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(title, fontSize = 12.sp, color = Theme.inkSoft())
-                    Text("$done / $goal $unit", fontSize = 11.sp, color = Theme.mutedInk())
-                }
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(5.dp)
-                        .clip(CircleShape)
-                        .background(Theme.muted()),
-                ) {
-                    val fraction = (done.toFloat() / goal.coerceAtLeast(1)).coerceIn(0f, 1f)
-                    if (fraction > 0f) {
-                        Spacer(Modifier.weight(fraction).height(5.dp).clip(CircleShape).background(accent))
+            snapshot.missions.forEach { mission -> MissionRow(mission, accent) }
+
+            snapshot.nextMission?.let { next ->
+                Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Filled.Bolt, null, tint = accent, modifier = Modifier.size(13.dp))
+                    Spacer(Modifier.size(4.dp))
+                    Text("NEXT CHARGE", style = EyebrowStyle, color = accent)
+                    Spacer(Modifier.size(8.dp))
+                    Text(
+                        next.pillar.title,
+                        fontSize = 11.5.sp, fontWeight = FontWeight.Bold, color = Theme.ink(),
+                    )
+                    Spacer(Modifier.weight(1f))
+                    snapshot.nextMilestone?.let { milestone ->
+                        Text(
+                            "${snapshot.pointsToNextMilestone} points to $milestone",
+                            fontSize = 10.sp, fontWeight = FontWeight.SemiBold, color = Theme.mutedInk(),
+                        )
                     }
-                    if (fraction < 1f) Spacer(Modifier.weight(1f - fraction))
                 }
             }
         }
     }
+}
+
+/** Green when the goal is met, accent while it is still being worked towards. */
+@Composable
+private fun MissionRow(mission: CareerMomentumMission, accent: Color) {
+    val done = Color(0xFF2AA84F)
+    val bar = if (mission.isComplete) done else accent
+
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Icon(mission.pillar.icon(), null, tint = Theme.ink(), modifier = Modifier.size(14.dp))
+            Spacer(Modifier.size(6.dp))
+            Text(
+                mission.pillar.title,
+                fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, color = Theme.ink(),
+            )
+            Spacer(Modifier.weight(1f))
+            Text(
+                "${mission.cappedValue}/${mission.goal}",
+                fontSize = 11.sp, fontWeight = FontWeight.Bold,
+                color = if (mission.isComplete) done else Theme.mutedInk(),
+            )
+        }
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .height(5.dp)
+                .clip(CircleShape)
+                .background(Theme.muted()),
+        ) {
+            val fraction = mission.progress.coerceIn(0f, 1f)
+            if (fraction > 0f) {
+                Spacer(Modifier.weight(fraction).height(5.dp).clip(CircleShape).background(bar))
+            }
+            if (fraction < 1f) Spacer(Modifier.weight(1f - fraction))
+        }
+    }
+}
+
+/** The nearest Material equivalents of the SF Symbols iOS uses per pillar. */
+private fun CareerMomentumPillar.icon(): ImageVector = when (this) {
+    CareerMomentumPillar.OPPORTUNITIES -> Icons.Filled.GpsFixed
+    CareerMomentumPillar.RELATIONSHIPS -> Icons.Filled.Groups
+    CareerMomentumPillar.PRACTICE -> Icons.Filled.GraphicEq
 }
 
 /**
