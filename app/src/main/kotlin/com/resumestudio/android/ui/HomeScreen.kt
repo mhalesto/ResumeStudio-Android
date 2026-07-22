@@ -53,9 +53,13 @@ import com.resumestudio.model.TemplateCatalogue
 fun HomeScreen(
     document: ResumeDocument,
     accent: Color,
+    resumeCount: Int,
     onOpenGallery: () -> Unit,
     onPreview: () -> Unit,
+    onEdit: () -> Unit,
     onOpenTemplate: (ResumeTemplate) -> Unit,
+    onLoadExample: () -> Unit,
+    onStartBlank: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -66,10 +70,10 @@ fun HomeScreen(
         verticalArrangement = Arrangement.spacedBy(Theme.sectionSpacing),
     ) {
         item { Hero(document, accent, onPreview, onOpenGallery) }
-        item { StartCreating(accent) }
-        item { CareerWorkspace(accent) }
+        item { StartCreating(accent, onLoadExample, onStartBlank) }
+        item { CareerWorkspace(accent, resumeCount) }
         item { Templates(accent, onOpenGallery, onOpenTemplate) }
-        item { RecentlyEdited(document, accent, onPreview) }
+        item { RecentlyEdited(document, accent, onEdit) }
         item { PrivacyNote() }
     }
 }
@@ -165,18 +169,20 @@ private fun Hero(
 // --- start creating ---------------------------------------------------------
 
 @Composable
-private fun StartCreating(accent: Color) {
+private fun StartCreating(accent: Color, onLoadExample: () -> Unit, onStartBlank: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         SectionHeading("Start creating", "Use example content or begin with a clean page.")
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             QuickStartCard(
                 "Example Résumé", "A complete, fictional sample",
-                Icons.Filled.Description, accent, Color.White, Modifier.weight(1f),
+                Icons.Filled.Description, accent, Color.White,
+                Modifier.weight(1f).clickable(onClick = onLoadExample),
             )
             QuickStartCard(
                 "Blank Résumé", "Build every section yourself",
                 // Inverted rather than a fixed dark: a navy badge vanishes on a dark card.
-                Icons.Filled.Add, Theme.ink(), Theme.paper(), Modifier.weight(1f),
+                Icons.Filled.Add, Theme.ink(), Theme.paper(),
+                Modifier.weight(1f).clickable(onClick = onStartBlank),
             )
         }
     }
@@ -209,11 +215,15 @@ private fun QuickStartCard(
 // --- workspace --------------------------------------------------------------
 
 @Composable
-private fun CareerWorkspace(accent: Color) {
+private fun CareerWorkspace(accent: Color, resumeCount: Int) {
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         SectionHeading("Career workspace", "Keep every résumé version and application connected.")
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            WorkspaceCard("My résumés", "1 version", Icons.Filled.Description, accent, Modifier.weight(1f))
+            WorkspaceCard(
+                "My résumés",
+                "$resumeCount version${if (resumeCount == 1) "" else "s"}",
+                Icons.Filled.Description, accent, Modifier.weight(1f),
+            )
             WorkspaceCard("Applications", "0 tracked", Icons.Filled.WorkOutline, accent, Modifier.weight(1f))
         }
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -257,7 +267,7 @@ private fun Templates(
     onOpenGallery: () -> Unit,
     onOpenTemplate: (ResumeTemplate) -> Unit,
 ) {
-    val featured = remember2 { listOf(ResumeTemplate.ATLAS, ResumeTemplate.NOIR, ResumeTemplate.GAUGE, ResumeTemplate.MODERN) }
+    val featured = androidx.compose.runtime.remember { listOf(ResumeTemplate.ATLAS, ResumeTemplate.NOIR, ResumeTemplate.GAUGE, ResumeTemplate.MODERN) }
 
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.Bottom) {
@@ -320,11 +330,11 @@ private fun TemplateStrip(template: ResumeTemplate, accent: Color, onClick: () -
 // --- recently edited --------------------------------------------------------
 
 @Composable
-private fun RecentlyEdited(document: ResumeDocument, accent: Color, onPreview: () -> Unit) {
+private fun RecentlyEdited(document: ResumeDocument, accent: Color, onEdit: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         SectionHeading("Recently edited", "Pick up where you left off.")
         Row(
-            Modifier.fillMaxWidth().cardSurface().clickable(onClick = onPreview).padding(14.dp),
+            Modifier.fillMaxWidth().cardSurface().clickable(onClick = onEdit).padding(14.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
@@ -343,7 +353,7 @@ private fun RecentlyEdited(document: ResumeDocument, accent: Color, onPreview: (
                     fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Theme.ink(),
                 )
                 Text(
-                    "${document.template.wireName.replaceFirstChar { it.uppercase() }} · edited just now",
+                    "${document.template.wireName.replaceFirstChar { it.uppercase() }} · tap to edit",
                     fontSize = 11.sp, color = Theme.mutedInk(),
                 )
             }
@@ -383,7 +393,3 @@ private fun planSummary(template: ResumeTemplate): String = buildList {
     if (plan.darkPaper) add("dark paper")
     if (plan.numberedSections) add("numbered")
 }.joinToString(" · ")
-
-/** `remember` without the import churn for a constant list. */
-@Composable
-private fun <T> remember2(block: () -> T): T = androidx.compose.runtime.remember(block)

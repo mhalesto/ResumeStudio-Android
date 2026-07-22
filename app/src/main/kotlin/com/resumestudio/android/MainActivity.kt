@@ -34,6 +34,7 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +48,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.resumestudio.android.ui.EditorScreen
 import com.resumestudio.android.ui.GalleryScreen
 import com.resumestudio.android.ui.HomeScreen
 import com.resumestudio.android.ui.LocalAccent
@@ -76,17 +79,18 @@ private enum class AppTab(val title: String, val icon: ImageVector) {
 }
 
 @Composable
-fun AppShell() {
-    // The accent belongs to the *document*, not to the shell. iOS reads it from
-    // `store.document.accent`, so one choice tints the UI and sets the ink in the
-    // exported PDF — holding a separate UI accent here would let the two drift,
-    // and Settings would be lying when it says the choice drives the export.
-    var accentName by rememberSaveable { mutableStateOf(sampleResume.accent.wireName) }
-    val accent = ResumeAccent.from(accentName) ?: ResumeAccent.ORANGE
-    val document = remember(accent) { sampleResume.copy(accent = accent) }
+fun AppShell(viewModel: ResumeViewModel = viewModel()) {
+    // The document is the single source of truth for the whole shell, accent
+    // included. iOS reads the accent from `store.document.accent`, so one choice
+    // tints the UI and sets the ink in the export; a separate UI accent here
+    // would let the two drift and make the Settings caption a lie.
+    val library by viewModel.state.collectAsState()
+    val document = library.document
+    val accent = document.accent
 
     var tab by rememberSaveable { mutableStateOf(AppTab.HOME.name) }
     var previewing by rememberSaveable { mutableStateOf<String?>(null) }
+    var editing by rememberSaveable { mutableStateOf(false) }
 
     ResumeStudioTheme(accent = accent) {
         val accentColor = LocalAccent.current
@@ -104,6 +108,19 @@ fun AppShell() {
             return@ResumeStudioTheme
         }
 
+        if (editing) {
+            BackHandler { editing = false }
+            EditorScreen(
+                document = document,
+                documentKey = library.activeResumeID,
+                accent = accentColor,
+                onEdit = viewModel::edit,
+                onBack = { editing = false },
+                modifier = Modifier.fillMaxSize(),
+            )
+            return@ResumeStudioTheme
+        }
+
         Scaffold(
             containerColor = Theme.paper(),
             bottomBar = { BottomBar(AppTab.valueOf(tab), accentColor) { tab = it.name } },
@@ -113,9 +130,13 @@ fun AppShell() {
                     AppTab.HOME -> HomeScreen(
                         document = document,
                         accent = accentColor,
+                        resumeCount = library.resumes.size,
                         onOpenGallery = { tab = AppTab.DOCUMENTS.name },
                         onPreview = { previewing = document.template.wireName },
+                        onEdit = { editing = true },
                         onOpenTemplate = { previewing = it.wireName },
+                        onLoadExample = viewModel::loadExample,
+                        onStartBlank = viewModel::startBlank,
                     )
 
                     AppTab.DOCUMENTS -> GalleryScreen(
@@ -129,7 +150,7 @@ fun AppShell() {
                             "application store is ported.",
                     )
 
-                    AppTab.SETTINGS -> SettingsScreen(accent) { accentName = it.wireName }
+                    AppTab.SETTINGS -> SettingsScreen(accent, viewModel::setAccent)
                 }
             }
         }
