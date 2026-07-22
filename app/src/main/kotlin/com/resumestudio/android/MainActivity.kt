@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.resumestudio.android.ui.EditorScreen
 import com.resumestudio.android.ui.ApplicationsScreen
+import com.resumestudio.android.ui.RecruiterScanScreen
 import com.resumestudio.android.ui.ResumeLibraryScreen
 import com.resumestudio.android.ui.CoverLetterScreen
 import com.resumestudio.android.ui.FloatingCareerCoach
@@ -107,6 +108,7 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
     var coaching by rememberSaveable { mutableStateOf(false) }
     var writingLetter by rememberSaveable { mutableStateOf(false) }
     var browsingLibrary by rememberSaveable { mutableStateOf(false) }
+    var scanning by rememberSaveable { mutableStateOf(false) }
 
     ResumeStudioTheme(accent = accent) {
         val accentColor = LocalAccent.current
@@ -125,6 +127,18 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
                     previewing = null
                 },
                 onShare = { ResumeExporter.share(context, document.copy(template = template)) },
+                modifier = Modifier.fillMaxSize(),
+            )
+            return@ResumeStudioTheme
+        }
+
+        if (scanning) {
+            BackHandler { scanning = false }
+            RecruiterScanScreen(
+                document = document,
+                accent = accentColor,
+                onOpenEditor = { scanning = false; editing = true },
+                onBack = { scanning = false },
                 modifier = Modifier.fillMaxSize(),
             )
             return@ResumeStudioTheme
@@ -190,6 +204,7 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
                         onOpenApplications = { tab = AppTab.APPLICATIONS.name },
                         onOpenCoverLetter = { writingLetter = true },
                         onOpenLibrary = { browsingLibrary = true },
+                        onOpenScan = { scanning = true },
                         onTodayAction = { action ->
                             when (action.route) {
                                 TodayRoute.EDITOR, TodayRoute.CLAIMS -> editing = true
@@ -208,6 +223,7 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
                     )
 
                     AppTab.DOCUMENTS -> GalleryScreen(
+                        document = document,
                         accent = accentColor,
                         onOpenTemplate = { previewing = it.wireName },
                     )

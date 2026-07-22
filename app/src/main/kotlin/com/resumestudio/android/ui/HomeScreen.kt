@@ -65,6 +65,7 @@ fun HomeScreen(
     onOpenApplications: () -> Unit,
     onOpenCoverLetter: () -> Unit,
     onOpenLibrary: () -> Unit,
+    onOpenScan: () -> Unit,
     onTodayAction: (TodayAction) -> Unit,
     onPreview: () -> Unit,
     onShare: () -> Unit,
@@ -88,7 +89,7 @@ fun HomeScreen(
         item {
             CareerWorkspace(
                 accent, resumeCount, applicationCount,
-                onOpenGallery, onOpenApplications, onOpenCoverLetter, onOpenLibrary,
+                onOpenGallery, onOpenApplications, onOpenCoverLetter, onOpenLibrary, onOpenScan,
             )
         }
         item { Templates(accent, onOpenGallery, onOpenTemplate) }
@@ -259,6 +260,7 @@ private fun CareerWorkspace(
     onOpenApplications: () -> Unit,
     onOpenCoverLetter: () -> Unit,
     onOpenLibrary: () -> Unit,
+    onOpenScan: () -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         SectionHeading("Career workspace", "Keep every résumé version and application connected.")
@@ -280,8 +282,8 @@ private fun CareerWorkspace(
                 R.drawable.workspace_import, accent, Modifier.weight(1f), onOpenCoverLetter,
             )
             ArtworkCard(
-                "Interview prep", "Nothing upcoming",
-                R.drawable.workspace_interview, accent, Modifier.weight(1f),
+                "Recruiter scan", "The first seven seconds",
+                R.drawable.workspace_ats, accent, Modifier.weight(1f), onOpenScan,
             )
         }
         SmartLinksCard(accent, linkCount = 0, viewCount = 0, onClick = {})

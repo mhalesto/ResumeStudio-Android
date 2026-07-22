@@ -48,16 +48,25 @@ import com.resumestudio.model.SideColumn
 import com.resumestudio.model.TemplateCatalogue
 import com.resumestudio.model.TemplatePlan
 import com.resumestudio.render.ResumePageRasterizer
+import com.resumestudio.render.TemplateThumbnailCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Composable
 fun GalleryScreen(
+    document: ResumeDocument,
     accent: Color,
     onOpenTemplate: (ResumeTemplate) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val templates = remember { ResumeTemplate.entries.sortedBy { it.wireName } }
+    val context = LocalContext.current
+    val thumbnails = remember(context) {
+        TemplateThumbnailCache(
+            directory = java.io.File(context.cacheDir, "thumbnails"),
+            rasterizer = ResumePageRasterizer(context.cacheDir),
+        )
+    }
 
     LazyColumn(
         modifier = modifier.fillMaxSize().background(Theme.paper()),
@@ -78,19 +87,31 @@ fun GalleryScreen(
             }
         }
         items(templates, key = { it.wireName }) { template ->
-            TemplateCard(template, accent) { onOpenTemplate(template) }
+            TemplateCard(template, document, thumbnails, accent) { onOpenTemplate(template) }
         }
     }
 }
 
 @Composable
-private fun TemplateCard(template: ResumeTemplate, accent: Color, onClick: () -> Unit) {
+private fun TemplateCard(
+    template: ResumeTemplate,
+    document: ResumeDocument,
+    thumbnails: TemplateThumbnailCache,
+    accent: Color,
+    onClick: () -> Unit,
+) {
     val plan = template.plan
+
+    // Rendered lazily per row, so a fast scroll never queues 140 renders.
+    val thumbnail by produceState<Bitmap?>(null, template, document) {
+        value = thumbnails.thumbnail(document, template)
+    }
+
     Row(
         Modifier.fillMaxWidth().cardSurface().clickable(onClick = onClick).padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        PageThumb(plan, accent)
+        PageThumb(plan, accent, thumbnail)
         Spacer(Modifier.size(12.dp))
         Column(Modifier.weight(1f)) {
             Text(
@@ -105,7 +126,19 @@ private fun TemplateCard(template: ResumeTemplate, accent: Color, onClick: () ->
 
 /** A miniature of the page's own shape — the band where the plan puts it. */
 @Composable
-private fun PageThumb(plan: TemplatePlan, accent: Color) {
+private fun PageThumb(plan: TemplatePlan, accent: Color, rendered: Bitmap? = null) {
+    if (rendered != null) {
+        Image(
+            bitmap = rendered.asImageBitmap(),
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .size(width = 34.dp, height = 48.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .background(Color.White),
+        )
+        return
+    }
     Box(
         Modifier
             .size(width = 34.dp, height = 48.dp)
