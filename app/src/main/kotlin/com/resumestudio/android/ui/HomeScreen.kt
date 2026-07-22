@@ -51,7 +51,9 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import com.resumestudio.model.CareerMomentumSnapshot
 import com.resumestudio.model.CoverLetterDocument
+import androidx.compose.material.icons.filled.AutoAwesome
 import com.resumestudio.model.CoverLetterTemplate
+import com.resumestudio.model.ResumeAccent
 import com.resumestudio.render.CoverLetterPdfRenderer
 import com.resumestudio.render.TemplateThumbnailCache
 import com.resumestudio.render.family
@@ -85,6 +87,10 @@ fun HomeScreen(
     onOpenCoverLetter: () -> Unit,
     onOpenLibrary: () -> Unit,
     onOpenScan: () -> Unit,
+    onOpenSettings: () -> Unit,
+    onOpenCoach: () -> Unit,
+    onImport: () -> Unit,
+    onUnavailable: (String) -> Unit,
     onTodayAction: (TodayAction) -> Unit,
     onPreview: () -> Unit,
     onShare: () -> Unit,
@@ -101,14 +107,16 @@ fun HomeScreen(
         ),
         verticalArrangement = Arrangement.spacedBy(Theme.sectionSpacing),
     ) {
-        item { Hero(document, accent, onPreview, onShare, onOpenGallery) }
+        item { Hero(document, accent, onPreview, onShare, onOpenGallery, onOpenCoverLetter, onOpenSettings) }
         item { TodaySection(todayActions, accent, onOpenApplications, onTodayAction) }
         item { StartCreating(accent, onLoadExample, onStartBlank) }
         item { CareerCampaign(accent, momentum, onOpenApplications) }
+        item { AICareerTools(accent, onOpenCoach, onUnavailable) }
         item {
             CareerWorkspace(
                 accent, resumeCount, applicationCount,
                 onOpenGallery, onOpenApplications, onOpenCoverLetter, onOpenLibrary, onOpenScan,
+                onImport, onUnavailable,
             )
         }
         item { Templates(accent, document, thumbnails, onOpenGallery, onOpenTemplate) }
@@ -127,6 +135,8 @@ private fun Hero(
     onPreview: () -> Unit,
     onShare: () -> Unit,
     onOpenGallery: () -> Unit,
+    onOpenCoverLetter: () -> Unit,
+    onOpenSettings: () -> Unit,
 ) {
     val greeting = document.personal.fullName
         .split(' ').firstOrNull { it.isNotBlank() }
@@ -214,10 +224,13 @@ private fun Hero(
                     Modifier.weight(1f).clickable(onClick = onOpenGallery),
                 )
                 StatTile(
-                    "${TemplateCatalogue.twoColumnTemplates().size}", "Two-column", accent,
-                    Modifier.weight(1f).clickable(onClick = onOpenGallery),
+                    "${CoverLetterTemplate.entries.size}", "Cover letters", accent,
+                    Modifier.weight(1f).clickable(onClick = onOpenCoverLetter),
                 )
-                StatTile("${document.experience.size}", "Roles", accent, Modifier.weight(1f))
+                StatTile(
+                    "${ResumeAccent.entries.size}", "Accents", accent,
+                    Modifier.weight(1f).clickable(onClick = onOpenSettings),
+                )
             }
         }
     }
@@ -281,6 +294,8 @@ private fun CareerWorkspace(
     onOpenCoverLetter: () -> Unit,
     onOpenLibrary: () -> Unit,
     onOpenScan: () -> Unit,
+    onImport: () -> Unit,
+    onUnavailable: (String) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         SectionHeading("Career workspace", "Keep every résumé version and application connected.")
@@ -291,22 +306,86 @@ private fun CareerWorkspace(
                 R.drawable.workspace_resumes, accent, Modifier.weight(1f), onOpenLibrary,
             )
             ArtworkCard(
-                "Applications",
-                "$applicationCount tracked",
+                "Applications", "$applicationCount tracked",
                 R.drawable.workspace_applications, accent, Modifier.weight(1f), onOpenApplications,
             )
         }
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            ArtworkCard(
+                "Interview prep", "Nothing upcoming",
+                R.drawable.workspace_interview, accent, Modifier.weight(1f),
+            ) { onUnavailable("Interview prep needs the AI backend, which is not wired on Android yet.") }
+            ArtworkCard(
+                "ATS check", "Evidence-based review",
+                R.drawable.workspace_ats, accent, Modifier.weight(1f), onOpenScan,
+            )
+        }
+        ArtworkCard(
+            "Find jobs", "Browse trusted boards, then share one here",
+            R.drawable.workspace_import, accent, Modifier.fillMaxWidth(),
+        ) { onUnavailable("Job boards need the capture backend, which is not wired on Android yet.") }
+
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             ArtworkCard(
                 "Cover letters", "Draft to match",
                 R.drawable.workspace_import, accent, Modifier.weight(1f), onOpenCoverLetter,
             )
             ArtworkCard(
-                "Recruiter scan", "The first seven seconds",
-                R.drawable.workspace_ats, accent, Modifier.weight(1f), onOpenScan,
+                "Import résumé", "PDF, DOCX or a backup",
+                R.drawable.workspace_import, accent, Modifier.weight(1f), onImport,
             )
         }
-        SmartLinksCard(accent, linkCount = 0, viewCount = 0, onClick = {})
+
+        SmartLinksCard(
+            accent = accent,
+            linkCount = 0,
+            viewCount = 0,
+            onClick = {
+                onUnavailable("Tracked links need the hosted backend, which is not wired on Android yet.")
+            },
+        )
+    }
+}
+
+/**
+ * The AI tools, following `aiCareerTools`.
+ *
+ * Both entries lead somewhere that needs the model backend, so both say so
+ * rather than opening a screen that can only apologise.
+ */
+@Composable
+private fun AICareerTools(accent: Color, onOpenCoach: () -> Unit, onUnavailable: (String) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        SectionHeading("AI career tools", "Write stronger content without losing control of your facts.")
+        HeroBanner(
+            title = "Career intelligence",
+            subtitle = "Benchmarks, market signals and what they mean for your next move.",
+            artwork = R.drawable.career_intelligence_hero,
+            onClick = {
+                onUnavailable("Career intelligence needs the benchmarks backend, which is not wired on Android yet.")
+            },
+        )
+
+        Row(
+            Modifier.fillMaxWidth().cardSurface().clickable(onClick = onOpenCoach).padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Box(
+                Modifier.size(54.dp).clip(RoundedCornerShape(16.dp)).background(accent.copy(alpha = 0.14f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(Icons.Filled.AutoAwesome, null, tint = accent, modifier = Modifier.size(21.dp))
+            }
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text("Target a job", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Theme.ink())
+                Text(
+                    "Match the advert, find gaps, and create a reviewed tailored draft.",
+                    fontSize = 11.5.sp, color = Theme.mutedInk(), lineHeight = 15.sp,
+                )
+            }
+            Icon(Icons.AutoMirrored.Filled.ArrowForward, null, tint = Theme.mutedInk(), modifier = Modifier.size(15.dp))
+        }
     }
 }
 
@@ -322,11 +401,6 @@ private fun CareerCampaign(accent: Color, momentum: CareerMomentumSnapshot, onOp
     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
         SectionHeading("This week", "Momentum comes from a rhythm, not a burst.")
         MomentumCard(snapshot = momentum, accent = accent, onClick = onOpen)
-        HeroBanner(
-            title = "Career intelligence",
-            subtitle = "Benchmarks, market signals and what they mean for your next move.",
-            artwork = R.drawable.career_intelligence_hero,
-        )
     }
 }
 

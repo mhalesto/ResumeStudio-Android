@@ -324,6 +324,10 @@ fun AppShell(viewModel: ResumeViewModel = viewModel()) {
                         onOpenCoverLetter = { writingLetter = true },
                         onOpenLibrary = { browsingLibrary = true },
                         onOpenScan = { scanning = true },
+                        onOpenSettings = { tab = AppTab.SETTINGS.name },
+                        onOpenCoach = { coaching = true },
+                        onImport = { importPicker.launch(arrayOf("application/json", "text/plain", "*/*")) },
+                        onUnavailable = { Toast.makeText(context, it, Toast.LENGTH_LONG).show() },
                         onTodayAction = { action ->
                             when (action.route) {
                                 TodayRoute.EDITOR, TodayRoute.CLAIMS -> editing = true

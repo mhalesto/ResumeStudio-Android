@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,7 +23,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.BookmarkBorder
+import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -35,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -72,7 +79,9 @@ fun ApplicationsScreen(
         ),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        item { CommandCentreHero(applications, accent) }
+        item { CommandCentreHero(accent) }
+
+        item { Metrics(applications, accent) }
 
         item {
             // The pipeline as filters, with counts. A stage showing zero is
@@ -82,10 +91,11 @@ fun ApplicationsScreen(
                 Modifier.horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(7.dp),
             ) {
-                FilterChip("All", applications.size, filter == null, accent) { filter = null }
+                StageChip("All", null, applications.size, filter == null, accent) { filter = null }
                 JobApplicationStatus.entries.forEach { status ->
-                    FilterChip(
+                    StageChip(
                         status.title,
+                        status.icon(),
                         applications.count { it.status == status },
                         filter == status,
                         accent,
@@ -131,60 +141,92 @@ fun ApplicationsScreen(
 }
 
 /**
- * The command centre's opening, following `ApplicationCommandCenterView`.
+ * The command centre's opening, following `pipelineHero`.
  *
- * Three figures rather than a chart: at the volumes a job hunt actually runs
- * at, a chart of five applications is decoration.
+ * A diagonal gradient with the accent blooming out of the top-right corner —
+ * the orb is what stops a dark slab reading as a header bar, and it is the
+ * user's own accent so the screen belongs to their palette.
  */
 @Composable
-private fun CommandCentreHero(applications: List<JobApplication>, accent: Color) {
-    Column(
+private fun CommandCentreHero(accent: Color) {
+    Box(
         Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(Theme.heroRadius))
-            .background(Brush.verticalGradient(listOf(Theme.heroTop(), Theme.heroBottom())))
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+            .heightIn(min = 220.dp)
+            .clip(RoundedCornerShape(28.dp))
+            .background(
+                Brush.linearGradient(
+                    colors = listOf(Theme.heroTop(), Theme.heroBottom()),
+                    start = Offset.Zero,
+                    end = Offset.Infinite,
+                ),
+            ),
     ) {
-        Text("APPLICATION COMMAND CENTER", style = EyebrowStyle, color = accent)
-        Text(
-            "Know what is moving\nand what needs you.",
-            style = displayStyle(27), color = Theme.heroInk, lineHeight = 32.sp,
+        // iOS blurs a 230pt circle by 40. A radial gradient is the same bloom
+        // without needing API 31's blur, so it looks right on every device the
+        // app supports rather than only the recent ones.
+        Box(
+            Modifier
+                .size(230.dp)
+                .align(Alignment.TopEnd)
+                .offset(x = 70.dp, y = (-60).dp)
+                .background(
+                    Brush.radialGradient(
+                        colors = listOf(accent.copy(alpha = 0.34f), Color.Transparent),
+                    ),
+                    shape = CircleShape,
+                ),
         )
-        Text(
-            "Every opportunity in one place, and what each is waiting on.",
-            fontSize = 12.5.sp, color = Theme.heroMutedInk, lineHeight = 17.sp,
-        )
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Metric("${applications.size}", "Tracked", Color(0xFF5B8DEF), Modifier.weight(1f))
-            Metric(
-                "${applications.count { it.status == JobApplicationStatus.INTERVIEW }}",
-                "Interview", accent, Modifier.weight(1f),
+
+        Column(
+            Modifier.align(Alignment.BottomStart).padding(22.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text("APPLICATION COMMAND CENTER", style = EyebrowStyle, color = accent)
+            Text(
+                "Know what is moving\nand what needs you.",
+                style = displayStyle(28), color = Theme.heroInk, lineHeight = 34.sp,
             )
-            Metric(
-                "${applications.count { it.status == JobApplicationStatus.OFFER }}",
-                "Offers", Color(0xFF2AA84F), Modifier.weight(1f),
+            Text(
+                "Every opportunity, document, interview and contact in one connected timeline.",
+                fontSize = 12.5.sp, color = Theme.heroMutedInk, lineHeight = 17.sp,
             )
         }
+    }
+}
+
+/** Three cards under the hero, not tiles inside it — the way iOS lays them out. */
+@Composable
+private fun Metrics(applications: List<JobApplication>, accent: Color) {
+    Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        Metric("${applications.size}", "Tracked", Color(0xFF3B82F6), Modifier.weight(1f))
+        Metric(
+            "${applications.count { it.status == JobApplicationStatus.INTERVIEW }}",
+            "Interview", accent, Modifier.weight(1f),
+        )
+        Metric(
+            "${applications.count { it.status == JobApplicationStatus.OFFER }}",
+            "Offers", Color(0xFF2AA84F), Modifier.weight(1f),
+        )
     }
 }
 
 @Composable
 private fun Metric(value: String, label: String, tint: Color, modifier: Modifier = Modifier) {
     Column(
-        modifier
-            .clip(RoundedCornerShape(Theme.tileRadius))
-            .background(Color.White.copy(alpha = 0.06f))
-            .padding(horizontal = 12.dp, vertical = 10.dp),
+        modifier.cardSurface(radius = 17.dp).padding(vertical = 14.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        Text(value, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = tint)
-        Text(label, fontSize = 10.5.sp, color = Theme.heroMutedInk)
+        Text(value, fontSize = 26.sp, fontWeight = FontWeight.Bold, color = tint)
+        Text(label, fontSize = 11.sp, color = Theme.mutedInk())
     }
 }
 
 @Composable
-private fun FilterChip(
+private fun StageChip(
     label: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector?,
     count: Int,
     selected: Boolean,
     accent: Color,
@@ -192,25 +234,40 @@ private fun FilterChip(
 ) {
     Row(
         Modifier
-            .clip(RoundedCornerShape(10.dp))
-            .background(if (selected) accent else Theme.card())
+            .clip(CircleShape)
+            .background(if (selected) accent else Theme.muted())
             .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .padding(horizontal = 12.dp, vertical = 9.dp),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
+        icon?.let {
+            Icon(
+                it, null,
+                tint = if (selected) Color.White else Theme.ink(),
+                modifier = Modifier.size(13.dp),
+            )
+        }
         Text(
             label,
-            fontSize = 11.5.sp,
-            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
-            color = if (selected) Color.White else Theme.inkSoft(),
+            fontSize = 11.5.sp, fontWeight = FontWeight.SemiBold,
+            color = if (selected) Color.White else Theme.ink(),
         )
-        Spacer(Modifier.size(5.dp))
         Text(
             "$count",
-            fontSize = 11.sp,
-            color = if (selected) Color.White.copy(alpha = 0.75f) else Theme.mutedInk(),
+            fontSize = 11.5.sp, fontWeight = FontWeight.SemiBold,
+            color = (if (selected) Color.White else Theme.ink()).copy(alpha = 0.7f),
         )
     }
+}
+
+/** The icons iOS gives each stage. */
+private fun JobApplicationStatus.icon(): androidx.compose.ui.graphics.vector.ImageVector = when (this) {
+    JobApplicationStatus.SAVED -> Icons.Filled.BookmarkBorder
+    JobApplicationStatus.APPLIED -> Icons.AutoMirrored.Filled.Send
+    JobApplicationStatus.INTERVIEW -> Icons.Filled.Groups
+    JobApplicationStatus.OFFER -> Icons.Filled.Star
+    JobApplicationStatus.REJECTED -> Icons.Filled.Close
 }
 
 @Composable
