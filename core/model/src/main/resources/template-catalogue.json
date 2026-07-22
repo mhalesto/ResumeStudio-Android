@@ -1,0 +1,2856 @@
+{
+  "$comment": "GENERATED from iOS ResumeDocument.swift by tools/generate-template-spec.py. Do not hand-edit.",
+  "schemaVersion": 1,
+  "templateCount": 140,
+  "templates": {
+    "atlas": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "leading",
+          "width": 186.0,
+          "fill": "dark",
+          "startsBelowProfile": false,
+          "divider": false
+        }
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "verso": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "trailing",
+          "width": 178.0,
+          "fill": "tint",
+          "startsBelowProfile": false,
+          "divider": false
+        }
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "oxford": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "leading",
+          "width": 182.0,
+          "fill": "accent",
+          "startsBelowProfile": false,
+          "divider": false
+        }
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "chronicle": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "timeline",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "gazette": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "dateGutter",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "strata": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "card",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "duo": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "trailing",
+          "width": 190.0,
+          "fill": "none",
+          "startsBelowProfile": true,
+          "divider": false
+        }
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "signal": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "iconGrid",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "concise": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "trailing",
+          "width": 176.0,
+          "fill": "none",
+          "startsBelowProfile": true,
+          "divider": false
+        }
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 0.86
+    },
+    "pivot": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": true,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "portrait": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "spotlight": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "beacon": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "harbor": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "bloom": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "atelier": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "canvas": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "modern": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "aurora": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "slate": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "onyx": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "minimal": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "lumen": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "nordic": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "cascade": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "contemporary": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "horizon": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "vector": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "technical": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "creative": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "mosaic": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "vertex": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "timeline": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "compact": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "corporate": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "meridian": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "classic": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "elegant": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "linen": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "ledger": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "quill": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "academic": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "monochrome": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "editorial": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "noir": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": true,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "gauge": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "trailing",
+          "width": 182.0,
+          "fill": "dark",
+          "startsBelowProfile": false,
+          "divider": false
+        }
+      },
+      "experience": "stacked",
+      "competencies": "meters",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "folio": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": true,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "insignia": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "marquee": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": true,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "metro": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "card",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "ivy": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "columns",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "crest": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "leading",
+          "width": 180.0,
+          "fill": "tint",
+          "startsBelowProfile": false,
+          "divider": false
+        }
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "geneva": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "leading",
+          "width": 172.0,
+          "fill": "none",
+          "startsBelowProfile": false,
+          "divider": true
+        }
+      },
+      "experience": "stacked",
+      "competencies": "meters",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "plinth": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "stockholm": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "trailing",
+          "width": 168.0,
+          "fill": "none",
+          "startsBelowProfile": false,
+          "divider": false
+        }
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "tandem": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "trailing",
+          "width": 172.0,
+          "fill": "tint",
+          "startsBelowProfile": false,
+          "divider": false
+        }
+      },
+      "experience": "timeline",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "varsity": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "leading",
+          "width": 162.0,
+          "fill": "none",
+          "startsBelowProfile": false,
+          "divider": false
+        }
+      },
+      "experience": "stacked",
+      "competencies": "columns",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 0.94
+    },
+    "laureate": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "modena": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "dateGutter",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "nova": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "prism": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "trailing",
+          "width": 178.0,
+          "fill": "accent",
+          "startsBelowProfile": false,
+          "divider": false
+        }
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "aurelia": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "nocturne": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": true,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "monarch": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "eclipse": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "contour": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "axis": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 54.0,
+      "density": 1.0
+    },
+    "terrace": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": true,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "vantage": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": true,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "apex": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "timeline",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": true,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "aperture": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "leading",
+          "width": 184.0,
+          "fill": "tint",
+          "startsBelowProfile": true,
+          "divider": false
+        }
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "arclight": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "dateGutter",
+      "competencies": "iconGrid",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "blueprint": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "trailing",
+          "width": 174.0,
+          "fill": "none",
+          "startsBelowProfile": false,
+          "divider": true
+        }
+      },
+      "experience": "stacked",
+      "competencies": "columns",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "catalyst": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "timeline",
+      "competencies": "meters",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": true,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "circuit": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "leading",
+          "width": 170.0,
+          "fill": "dark",
+          "startsBelowProfile": false,
+          "divider": false
+        }
+      },
+      "experience": "timeline",
+      "competencies": "meters",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "continuum": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "dateGutter",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": true,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "district": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "trailing",
+          "width": 184.0,
+          "fill": "tint",
+          "startsBelowProfile": false,
+          "divider": false
+        }
+      },
+      "experience": "timeline",
+      "competencies": "iconGrid",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "ember": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "card",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": true,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "facet": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "leading",
+          "width": 176.0,
+          "fill": "accent",
+          "startsBelowProfile": true,
+          "divider": false
+        }
+      },
+      "experience": "stacked",
+      "competencies": "columns",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "gallery": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "iconGrid",
+      "sectionChrome": "card",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": true,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "halo": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "card",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": true,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "helix": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "trailing",
+          "width": 166.0,
+          "fill": "none",
+          "startsBelowProfile": false,
+          "divider": false
+        }
+      },
+      "experience": "timeline",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": true,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "kinetic": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "timeline",
+      "competencies": "iconGrid",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": true,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "lattice": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "leading",
+          "width": 174.0,
+          "fill": "tint",
+          "startsBelowProfile": false,
+          "divider": false
+        }
+      },
+      "experience": "dateGutter",
+      "competencies": "meters",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "nexus": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "meters",
+      "sectionChrome": "card",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": true,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "orbit": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": true,
+      "darkPaper": false,
+      "hangingHeadings": true,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "panorama": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "trailing",
+          "width": 192.0,
+          "fill": "none",
+          "startsBelowProfile": true,
+          "divider": false
+        }
+      },
+      "experience": "stacked",
+      "competencies": "columns",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "quantum": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "leading",
+          "width": 180.0,
+          "fill": "none",
+          "startsBelowProfile": false,
+          "divider": true
+        }
+      },
+      "experience": "stacked",
+      "competencies": "iconGrid",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 0.92
+    },
+    "ribbon": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "timeline",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 28.0,
+      "density": 1.0
+    },
+    "runway": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "dateGutter",
+      "competencies": "meters",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": true,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "sentinel": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "trailing",
+          "width": 178.0,
+          "fill": "dark",
+          "startsBelowProfile": false,
+          "divider": false
+        }
+      },
+      "experience": "stacked",
+      "competencies": "iconGrid",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "spectrum": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "card",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": true,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "summit": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "columns",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": true,
+      "numberedSections": true,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "tessera": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "leading",
+          "width": 190.0,
+          "fill": "tint",
+          "startsBelowProfile": false,
+          "divider": false
+        }
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "card",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "vault": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "columns",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": true,
+      "darkPaper": true,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "wave": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "timeline",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": true,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "zenith": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": true,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": true,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "alcove": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "trailing",
+          "width": 176.0,
+          "fill": "accent",
+          "startsBelowProfile": true,
+          "divider": false
+        }
+      },
+      "experience": "stacked",
+      "competencies": "meters",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "sovereign": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "dateGutter",
+      "competencies": "columns",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": true,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "palisade": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "leading",
+          "width": 188.0,
+          "fill": "dark",
+          "startsBelowProfile": false,
+          "divider": false
+        }
+      },
+      "experience": "dateGutter",
+      "competencies": "chips",
+      "sectionChrome": "card",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "volta": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "timeline",
+      "competencies": "meters",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": true,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 42.0,
+      "density": 1.0
+    },
+    "obsidian": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "card",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": true,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "radiant": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": true,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "verge": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "columns",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "datum": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "meters",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": true,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "pinnacle": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "columns",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": true,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "cobalt": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "card",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "equinox": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "columns",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "mirage": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "parallax": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "card",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "emblem": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "cadence": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "timeline",
+      "competencies": "meters",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "citadel": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "dateGutter",
+      "competencies": "columns",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "atrium": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "zephyr": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": true,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "cinder": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "card",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": true,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "keystone": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "columns",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": true,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "loom": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "graphite": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "columns",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 0.94
+    },
+    "stratus": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "vellum": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "dateGutter",
+      "competencies": "columns",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "salute": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "couture": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "medallion": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "sable": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "terracotta": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "lozenge": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "circlet": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "vogue": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "signet": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "almanac": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "bullets",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "kintsugi": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "dateGutter",
+      "competencies": "columns",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": true,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 0.97
+    },
+    "bauhaus": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "leading",
+          "width": 164.0,
+          "fill": "accent",
+          "startsBelowProfile": true,
+          "divider": false
+        }
+      },
+      "experience": "stacked",
+      "competencies": "dots",
+      "sectionChrome": "card",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "terminal": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "timeline",
+      "competencies": "columns",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": true,
+      "darkPaper": true,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 0.9
+    },
+    "topograph": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "chips",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": true,
+      "darkPaper": false,
+      "hangingHeadings": true,
+      "profileInHeader": false,
+      "bodyInset": 32.0,
+      "density": 1.0
+    },
+    "passport": {
+      "body": {
+        "kind": "side",
+        "column": {
+          "edge": "trailing",
+          "width": 182.0,
+          "fill": "tint",
+          "startsBelowProfile": false,
+          "divider": false
+        }
+      },
+      "experience": "dateGutter",
+      "competencies": "iconGrid",
+      "sectionChrome": "plain",
+      "contact": "iconRows",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 1.0
+    },
+    "transit": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "timeline",
+      "competencies": "iconGrid",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": true,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 38.0,
+      "density": 1.0
+    },
+    "cutline": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "dateGutter",
+      "competencies": "dots",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": false,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": true,
+      "bodyInset": 0.0,
+      "density": 0.96
+    },
+    "receipt": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "stacked",
+      "competencies": "columns",
+      "sectionChrome": "plain",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": true,
+      "numberedSections": true,
+      "darkPaper": false,
+      "hangingHeadings": false,
+      "profileInHeader": false,
+      "bodyInset": 0.0,
+      "density": 0.82
+    },
+    "constellation": {
+      "body": {
+        "kind": "single"
+      },
+      "experience": "timeline",
+      "competencies": "dots",
+      "sectionChrome": "card",
+      "contact": "inline",
+      "education": null,
+      "references": null,
+      "additional": null,
+      "skillsFirst": false,
+      "numberedSections": true,
+      "darkPaper": true,
+      "hangingHeadings": false,
+      "profileInHeader": true,
+      "bodyInset": 0.0,
+      "density": 1.0
+    }
+  }
+}
