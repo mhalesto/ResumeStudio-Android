@@ -2,128 +2,221 @@ package com.resumestudio.android
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.WorkOutline
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.resumestudio.model.BodyLayout
+import androidx.compose.ui.unit.sp
+import com.resumestudio.android.ui.GalleryScreen
+import com.resumestudio.android.ui.HomeScreen
+import com.resumestudio.android.ui.LocalAccent
+import com.resumestudio.android.ui.ResumeStudioTheme
+import com.resumestudio.android.ui.SectionHeading
+import com.resumestudio.android.ui.TemplatePreviewScreen
+import com.resumestudio.android.ui.Theme
+import com.resumestudio.android.ui.cardSurface
+import com.resumestudio.android.ui.displayStyle
 import com.resumestudio.model.ResumeAccent
 import com.resumestudio.model.ResumeTemplate
-import com.resumestudio.model.TemplateCatalogue
-import com.resumestudio.model.TemplatePlan
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent {
-            MaterialTheme { CatalogueScreen() }
+        setContent { AppShell() }
+    }
+}
+
+/** The tab bar, matching `AppTab` in `RootView.swift`. */
+private enum class AppTab(val title: String, val icon: ImageVector) {
+    HOME("Today", Icons.Filled.AutoAwesome),
+    DOCUMENTS("Documents", Icons.Filled.Description),
+    APPLICATIONS("Applications", Icons.Filled.WorkOutline),
+    SETTINGS("Settings", Icons.Filled.Settings),
+}
+
+@Composable
+fun AppShell() {
+    // The accent belongs to the *document*, not to the shell. iOS reads it from
+    // `store.document.accent`, so one choice tints the UI and sets the ink in the
+    // exported PDF — holding a separate UI accent here would let the two drift,
+    // and Settings would be lying when it says the choice drives the export.
+    var accentName by rememberSaveable { mutableStateOf(sampleResume.accent.wireName) }
+    val accent = ResumeAccent.from(accentName) ?: ResumeAccent.ORANGE
+    val document = remember(accent) { sampleResume.copy(accent = accent) }
+
+    var tab by rememberSaveable { mutableStateOf(AppTab.HOME.name) }
+    var previewing by rememberSaveable { mutableStateOf<String?>(null) }
+
+    ResumeStudioTheme(accent = accent) {
+        val accentColor = LocalAccent.current
+        val template = previewing?.let(ResumeTemplate::from)
+
+        if (template != null) {
+            BackHandler { previewing = null }
+            TemplatePreviewScreen(
+                template = template,
+                document = document,
+                accent = accentColor,
+                onBack = { previewing = null },
+                modifier = Modifier.fillMaxSize(),
+            )
+            return@ResumeStudioTheme
+        }
+
+        Scaffold(
+            containerColor = Theme.paper(),
+            bottomBar = { BottomBar(AppTab.valueOf(tab), accentColor) { tab = it.name } },
+        ) { padding ->
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                when (AppTab.valueOf(tab)) {
+                    AppTab.HOME -> HomeScreen(
+                        document = document,
+                        accent = accentColor,
+                        onOpenGallery = { tab = AppTab.DOCUMENTS.name },
+                        onPreview = { previewing = document.template.wireName },
+                        onOpenTemplate = { previewing = it.wireName },
+                    )
+
+                    AppTab.DOCUMENTS -> GalleryScreen(
+                        accent = accentColor,
+                        onOpenTemplate = { previewing = it.wireName },
+                    )
+
+                    AppTab.APPLICATIONS -> ComingSoon(
+                        "Applications",
+                        "Tracking, packets and interview prep land here once the " +
+                            "application store is ported.",
+                    )
+
+                    AppTab.SETTINGS -> SettingsScreen(accent) { accentName = it.wireName }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun BottomBar(selected: AppTab, accent: Color, onSelect: (AppTab) -> Unit) {
+    NavigationBar(containerColor = Theme.card(), tonalElevation = 0.dp) {
+        AppTab.entries.forEach { entry ->
+            NavigationBarItem(
+                selected = entry == selected,
+                onClick = { onSelect(entry) },
+                icon = { Icon(entry.icon, contentDescription = entry.title, Modifier.size(20.dp)) },
+                label = { Text(entry.title, fontSize = 10.sp) },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = accent,
+                    selectedTextColor = accent,
+                    indicatorColor = accent.copy(alpha = 0.14f),
+                    unselectedIconColor = Theme.mutedInk(),
+                    unselectedTextColor = Theme.mutedInk(),
+                ),
+            )
         }
     }
 }
 
 /**
- * A read-out of the mirrored catalogue.
+ * Settings, currently just the accent picker.
  *
- * This is scaffolding, not the gallery: it exists so the shared spec can be seen
- * working on a device before the renderer has a preview to show. It is the first
- * thing that should be replaced once `:core:render` produces page images.
+ * It earns its place ahead of the rest of Settings because it is the one control
+ * that proves the theme is wired the way iOS's is — every surface, tab and
+ * button should retint from here, with nothing hard-coded to orange.
  */
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun CatalogueScreen() {
-    val templates = remember { ResumeTemplate.entries.sortedBy { it.wireName } }
-    val twoColumn = remember { TemplateCatalogue.twoColumnTemplates().toSet() }
+private fun SettingsScreen(current: ResumeAccent, onPick: (ResumeAccent) -> Unit) {
+    Column(
+        Modifier
+            .fillMaxSize()
+            .background(Theme.paper())
+            .verticalScroll(rememberScrollState())
+            .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
+        Text("Settings", style = displayStyle(30), color = Theme.ink())
+        SectionHeading("Accent", "Tints the app and drives the exported PDF.")
 
-    Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("Templates · ${TemplateCatalogue.templateCount}") })
-        },
-    ) { padding ->
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(padding),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            item {
-                Text(
-                    "${twoColumn.size} of ${templates.size} lay the page out in two columns.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(bottom = 8.dp),
-                )
+        Column(Modifier.fillMaxWidth().cardSurface().padding(14.dp)) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                ResumeAccent.entries.forEach { entry ->
+                    Box(
+                        Modifier
+                            .size(34.dp)
+                            .clip(CircleShape)
+                            .background(Color(entry.argb))
+                            .clickable { onPick(entry) },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        if (entry == current) {
+                            Box(Modifier.size(12.dp).clip(CircleShape).background(Color.White))
+                        }
+                    }
+                }
             }
-            items(templates) { template ->
-                TemplateRow(template, template.plan)
-            }
-        }
-    }
-}
-
-@Composable
-private fun TemplateRow(template: ResumeTemplate, plan: TemplatePlan) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(14.dp)) {
+            Spacer(Modifier.height(12.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    template.wireName.replaceFirstChar { it.uppercase() },
-                    style = MaterialTheme.typography.titleMedium,
-                )
-                Spacer(Modifier.width(8.dp))
-                if (plan.darkPaper) Swatch(Color(0xFF14161A))
+                Text(current.title, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Theme.ink())
+                Spacer(Modifier.size(8.dp))
+                if (current.isPremium) {
+                    Text(
+                        current.tier.name.lowercase().replaceFirstChar { it.uppercase() },
+                        fontSize = 10.sp, color = LocalAccent.current,
+                    )
+                }
             }
-            Spacer(Modifier.size(4.dp))
-            Text(plan.summary(), style = MaterialTheme.typography.bodySmall)
         }
     }
 }
 
 @Composable
-private fun Swatch(color: Color) {
-    Spacer(Modifier.size(12.dp).clip(CircleShape).background(color))
-}
-
-/** The plan in a line, so a row says what the template actually does. */
-private fun TemplatePlan.summary(): String = buildList {
-    when (val body = body) {
-        is BodyLayout.Side -> add(
-            "${body.column.width.toInt()}pt ${body.column.edge.name.lowercase()} column, " +
-                body.column.fill.name.lowercase() + " fill",
-        )
-        BodyLayout.Single -> add("single column")
+private fun ComingSoon(title: String, detail: String) {
+    Column(
+        Modifier.fillMaxSize().background(Theme.paper()).padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Text(title, style = displayStyle(30), color = Theme.ink())
+        Text(detail, fontSize = 13.sp, color = Theme.mutedInk(), lineHeight = 19.sp)
     }
-    add("${experience.name.lowercase()} roles")
-    add("${competencies.name.lowercase()} skills")
-    if (skillsFirst) add("skills first")
-    if (numberedSections) add("numbered")
-    if (hangingHeadings) add("hanging headings")
-    if (profileInHeader) add("summary in masthead")
-    if (bodyInset > 0f) add("${bodyInset.toInt()}pt inset")
-    if (density != 1f) add("density $density")
-}.joinToString(" · ")
-
-/** Kept next to the screen so the accent list has one obvious place to grow. */
-internal val previewAccent: ResumeAccent = ResumeAccent.ORANGE
+}

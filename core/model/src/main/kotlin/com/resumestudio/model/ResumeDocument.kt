@@ -40,6 +40,26 @@ data class ResumeDocument(
             .take(2)
             .joinToString("") { it.first().uppercase() }
 
+    /** How much of the résumé has content, 0–1. The nine checks iOS makes. */
+    val completion: Double
+        get() {
+            val checks = listOf(
+                personal.fullName.isNotBlank(),
+                personal.headline.isNotBlank(),
+                personal.email.isNotBlank(),
+                personal.phone.isNotBlank(),
+                professionalProfile.isNotBlank(),
+                competencies.any { it.isNotBlank() },
+                experience.any { it.role.isNotBlank() || it.company.isNotBlank() },
+                education.any { it.qualification.isNotBlank() || it.institution.isNotBlank() },
+                references.any { it.name.isNotBlank() },
+            )
+            return checks.count { it }.toDouble() / checks.size
+        }
+
+    /** [completion] as a whole percentage, for display. */
+    val completionPercentage: Int get() = Math.round(completion * 100).toInt()
+
     // Data classes with an array member need these written out by hand; the
     // generated versions compare the reference, not the bytes.
     override fun equals(other: Any?): Boolean {
